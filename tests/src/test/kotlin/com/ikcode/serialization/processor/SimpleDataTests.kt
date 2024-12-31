@@ -4,8 +4,8 @@ import com.ikcode.serialization.processor.examples.simple.*
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class SimpleDataTests {
     //TODO Byte

@@ -4,8 +4,8 @@ import com.ikcode.serialization.processor.examples.collections.IntHashSetData_Pa
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
-import org.junit.Assert
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class SimpleHashSetTests {
 
@@ -25,11 +25,11 @@ class SimpleHashSetTests {
         val pointer = IntHashSetData_Packer().pack(data, session) as ReferencePointer
         val packed = session.referencedData.first { it.pointer == pointer}.dataMap
 
-        Assert.assertEquals(listOf(1), packed["readonlyC"])
-        Assert.assertEquals(listOf(2), packed["mutableC"])
-        Assert.assertEquals(listOf(3), packed["nullableValueC"])
-        Assert.assertEquals(listOf(4), packed["mutable"])
-        Assert.assertEquals(listOf(5), packed["nullableValue"])
+        assertEquals(listOf(1), packed["readonlyC"])
+        assertEquals(listOf(2), packed["mutableC"])
+        assertEquals(listOf(3), packed["nullableValueC"])
+        assertEquals(listOf(4), packed["mutable"])
+        assertEquals(listOf(5), packed["nullableValue"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -38,12 +38,12 @@ class SimpleHashSetTests {
             UnpackingSession(session.referencedData)
         )
 
-        Assert.assertEquals(hashSetOf(1), unpacked.readonlyC)
-        Assert.assertEquals(hashSetOf(2), unpacked.mutableC)
-        Assert.assertEquals(hashSetOf(3), unpacked.nullableValueC)
-        Assert.assertEquals(hashSetOf(4), unpacked.mutable)
-        Assert.assertEquals(hashSetOf(5), unpacked.nullableValue)
-        Assert.assertEquals(null, unpacked.nullableNullC)
-        Assert.assertEquals(null, unpacked.nullableNull)
+        assertEquals(hashSetOf(1), unpacked.readonlyC)
+        assertEquals(hashSetOf(2), unpacked.mutableC)
+        assertEquals(hashSetOf(3), unpacked.nullableValueC)
+        assertEquals(hashSetOf(4), unpacked.mutable)
+        assertEquals(hashSetOf(5), unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
     }
 }

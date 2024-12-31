@@ -1,0 +1,21 @@
+name: api CI
+
+on:
+  push:
+    branches: [ "master" ]
+    paths: ["api/**", "api.integrationTests/**"]
+  pull_request:
+    branches: [ "master" ]
+    paths: ["api/**", "api.integrationTests/**"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+    - name: Test with Gradle
+      run: ./gradlew test

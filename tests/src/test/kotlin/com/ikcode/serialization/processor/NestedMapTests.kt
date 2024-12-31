@@ -5,8 +5,8 @@ import com.ikcode.serialization.processor.examples.collections.IntMapNestedValue
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
-import org.junit.Assert
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class NestedMapTests {
 
@@ -26,11 +26,11 @@ class NestedMapTests {
         val pointer = IntMapNestedValueData_Packer().pack(data, session) as ReferencePointer
         val packed = session.referencedData.first { it.pointer == pointer}.dataMap
 
-        Assert.assertEquals(listOf(mapOf(1 to 10)), packed["readonlyC"])
-        Assert.assertEquals(listOf(mapOf(2 to 20)), packed["mutableC"])
-        Assert.assertEquals(listOf(mapOf(3 to 30)), packed["nullableValueC"])
-        Assert.assertEquals(listOf(mapOf(4 to 40)), packed["mutable"])
-        Assert.assertEquals(listOf(mapOf(5 to 50)), packed["nullableValue"])
+        assertEquals(listOf(mapOf(1 to 10)), packed["readonlyC"])
+        assertEquals(listOf(mapOf(2 to 20)), packed["mutableC"])
+        assertEquals(listOf(mapOf(3 to 30)), packed["nullableValueC"])
+        assertEquals(listOf(mapOf(4 to 40)), packed["mutable"])
+        assertEquals(listOf(mapOf(5 to 50)), packed["nullableValue"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -39,12 +39,12 @@ class NestedMapTests {
             UnpackingSession(session.referencedData)
         )
 
-        Assert.assertEquals(listOf(hashMapOf(1 to 10)), unpacked.readonlyC)
-        Assert.assertEquals(listOf(hashMapOf(2 to 20)), unpacked.mutableC)
-        Assert.assertEquals(listOf(hashMapOf(3 to 30)), unpacked.nullableValueC)
-        Assert.assertEquals(listOf(hashMapOf(4 to 40)), unpacked.mutable)
-        Assert.assertEquals(listOf(hashMapOf(5 to 50)), unpacked.nullableValue)
-        Assert.assertEquals(null, unpacked.nullableNullC)
-        Assert.assertEquals(null, unpacked.nullableNull)
+        assertEquals(listOf(hashMapOf(1 to 10)), unpacked.readonlyC)
+        assertEquals(listOf(hashMapOf(2 to 20)), unpacked.mutableC)
+        assertEquals(listOf(hashMapOf(3 to 30)), unpacked.nullableValueC)
+        assertEquals(listOf(hashMapOf(4 to 40) as Map<Int, Int>), unpacked.mutable)
+        assertEquals(listOf(hashMapOf(5 to 50) as Map<Int, Int>), unpacked.nullableValue!!)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
     }
 }

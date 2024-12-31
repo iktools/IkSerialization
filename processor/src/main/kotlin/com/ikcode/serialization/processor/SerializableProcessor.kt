@@ -8,7 +8,10 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.validate
 import com.ikcode.serialization.core.annotations.SerializableClass
+import com.ikcode.serialization.core.session.PackingSession
+import com.ikcode.serialization.core.session.UnpackingSession
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
 
 class SerializableProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
@@ -24,7 +27,21 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
 
         packers.forEach { packer ->
             val fileName = packer .name + "_Packer"
+            val packFunc = FunSpec.builder("pack")
+                .addParameter("obj", packer.kpType)
+                .addParameter("session", PackingSession::class)
+                .returns(Any::class)
+                .addStatement("TODO()")
+
+            val unpackFunc = FunSpec.builder("unpack")
+                .addParameter("packedData", Any::class)
+                .addParameter("session", UnpackingSession::class)
+                .returns(packer.kpType)
+                .addStatement("TODO()")
+
             val type = TypeSpec.classBuilder(fileName)
+                .addFunction(packFunc.build())
+                .addFunction(unpackFunc.build())
 
             val fileText = FileSpec.builder(packer .namespace, fileName)
                 .addType(type.build())
