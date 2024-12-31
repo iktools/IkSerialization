@@ -1,0 +1,257 @@
+package com.ikcode.serialization.processor
+
+import com.ikcode.serialization.processor.examples.inheritance.*
+import com.ikcode.serialization.core.references.ReferencePointer
+import com.ikcode.serialization.core.session.PackingSession
+import com.ikcode.serialization.core.session.UnpackingSession
+import org.junit.Assert
+import org.junit.Test
+
+class InheritanceTests {
+    //TODO test unpacking from base type
+
+    @Test
+    fun interfaceImplementationTests() {
+        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val data = com.ikcode.serialization.processor.examples.inheritance.ImplementationData(
+            referencedData1, referencedData1, null, referencedData1,
+            referencedData2, referencedData2, null, referencedData2
+        ).apply {
+            mutable1 = referencedData1
+            nullableNull1 = null
+            nullableValue1 = referencedData1
+
+            mutable2 = referencedData2
+            nullableNull2 = null
+            nullableValue2 = referencedData2
+        }
+        val session = PackingSession()
+        val pointer = ImplementationData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        val reference1 = (packed["readonlyC1"] as ReferencePointer).name
+        assert(reference1.startsWith("ObjectSample"))
+        Assert.assertEquals(reference1, (packed["mutableC1"] as ReferencePointer).name)
+        Assert.assertEquals(reference1, (packed["nullableValueC1"] as ReferencePointer).name)
+        Assert.assertEquals(reference1, (packed["mutable1"] as ReferencePointer).name)
+        Assert.assertEquals(reference1, (packed["nullableValue1"] as ReferencePointer).name)
+        assert(!packed.containsKey("nullableNullC1"))
+        assert(!packed.containsKey("nullableNull1"))
+
+        val reference2 = (packed["readonlyC2"] as ReferencePointer).name
+        assert(reference2.startsWith("ObjectSample"))
+        assert(reference1 != reference2)
+        Assert.assertEquals(reference2, (packed["mutableC2"] as ReferencePointer).name)
+        Assert.assertEquals(reference2, (packed["nullableValueC2"] as ReferencePointer).name)
+        Assert.assertEquals(reference2, (packed["mutable2"] as ReferencePointer).name)
+        Assert.assertEquals(reference2, (packed["nullableValue2"] as ReferencePointer).name)
+        assert(!packed.containsKey("nullableNullC2"))
+        assert(!packed.containsKey("nullableNull2"))
+
+        val unpacked = ImplementationData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        val obj1 = unpacked.readonlyC1
+        Assert.assertEquals(obj1, unpacked.mutableC1)
+        Assert.assertEquals(obj1, unpacked.nullableValueC1)
+        Assert.assertEquals(obj1, unpacked.mutable1)
+        Assert.assertEquals(obj1, unpacked.nullableValue1)
+        Assert.assertEquals(null, unpacked.nullableNullC1)
+        Assert.assertEquals(null, unpacked.nullableNull1)
+
+        val obj2 = unpacked.readonlyC2
+        assert(obj1 != obj2)
+        Assert.assertEquals(obj2, unpacked.mutableC2)
+        Assert.assertEquals(obj2, unpacked.nullableValueC2)
+        Assert.assertEquals(obj2, unpacked.mutable2)
+        Assert.assertEquals(obj2, unpacked.nullableValue2)
+        Assert.assertEquals(null, unpacked.nullableNullC2)
+        Assert.assertEquals(null, unpacked.nullableNull2)
+    }
+
+    @Test
+    fun concreteClassTests() {
+        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData3 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData4 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val data = ConcreteData(
+            referencedData1, referencedData1, null, referencedData1,
+            referencedData2, referencedData2, null, referencedData2,
+            referencedData3, referencedData3, null, referencedData3,
+            referencedData4, referencedData4, null, referencedData4
+        ).apply {
+            baseMutable1 = referencedData1
+            baseNullableNull1 = null
+            baseNullableValue1 = referencedData1
+
+            baseMutable2 = referencedData2
+            baseNullableNull2 = null
+            baseNullableValue2 = referencedData2
+
+            derivedMutable1 = referencedData3
+            derivedNullableNull1 = null
+            derivedNullableValue1 = referencedData3
+
+            derivedMutable2 = referencedData4
+            derivedNullableNull2 = null
+            derivedNullableValue2 = referencedData4
+        }
+
+        val session = PackingSession()
+        val pointer = ConcreteData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        val reference1 = (packed["baseReadonlyC1"] as ReferencePointer).name
+        assert(reference1.startsWith("ObjectSample"))
+        Assert.assertEquals(reference1, (packed["baseMutableC1"] as ReferencePointer).name)
+        Assert.assertEquals(reference1, (packed["baseNullableValueC1"] as ReferencePointer).name)
+        Assert.assertEquals(reference1, (packed["baseMutable1"] as ReferencePointer).name)
+        Assert.assertEquals(reference1, (packed["baseNullableValue1"] as ReferencePointer).name)
+        assert(!packed.containsKey("baseNullableNullC1"))
+        assert(!packed.containsKey("baseNullableNull1"))
+
+        val reference2 = (packed["baseReadonlyC2"] as ReferencePointer).name
+        assert(reference2.startsWith("ObjectSample"))
+        Assert.assertEquals(reference2, (packed["baseMutableC2"] as ReferencePointer).name)
+        Assert.assertEquals(reference2, (packed["baseNullableValueC2"] as ReferencePointer).name)
+        Assert.assertEquals(reference2, (packed["baseMutable2"] as ReferencePointer).name)
+        Assert.assertEquals(reference2, (packed["baseNullableValue2"] as ReferencePointer).name)
+        assert(!packed.containsKey("baseNullableNullC2"))
+        assert(!packed.containsKey("baseNullableNull2"))
+
+        val reference3 = (packed["derivedReadonlyC1"] as ReferencePointer).name
+        assert(reference3.startsWith("ObjectSample"))
+        Assert.assertEquals(reference3, (packed["derivedMutableC1"] as ReferencePointer).name)
+        Assert.assertEquals(reference3, (packed["derivedNullableValueC1"] as ReferencePointer).name)
+        Assert.assertEquals(reference3, (packed["derivedMutable1"] as ReferencePointer).name)
+        Assert.assertEquals(reference3, (packed["derivedNullableValue1"] as ReferencePointer).name)
+        assert(!packed.containsKey("derivedNullableNullC1"))
+        assert(!packed.containsKey("derivedNullableNull1"))
+
+        val reference4 = (packed["derivedReadonlyC2"] as ReferencePointer).name
+        assert(reference4.startsWith("ObjectSample"))
+        Assert.assertEquals(reference4, (packed["derivedMutableC2"] as ReferencePointer).name)
+        Assert.assertEquals(reference4, (packed["derivedNullableValueC2"] as ReferencePointer).name)
+        Assert.assertEquals(reference4, (packed["derivedMutable2"] as ReferencePointer).name)
+        Assert.assertEquals(reference4, (packed["derivedNullableValue2"] as ReferencePointer).name)
+        assert(!packed.containsKey("derivedNullableNullC2"))
+        assert(!packed.containsKey("derivedNullableNull2"))
+
+        val unpacked = ConcreteData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        val obj1 = unpacked.baseReadonlyC1
+        Assert.assertEquals(obj1, unpacked.baseMutableC1)
+        Assert.assertEquals(obj1, unpacked.baseNullableValueC1)
+        Assert.assertEquals(obj1, unpacked.baseMutable1)
+        Assert.assertEquals(obj1, unpacked.baseNullableValue1)
+        Assert.assertEquals(null, unpacked.baseNullableNullC1)
+        Assert.assertEquals(null, unpacked.baseNullableNull1)
+
+        val obj2 = unpacked.baseReadonlyC2
+        assert(obj1 != obj2)
+        Assert.assertEquals(obj2, unpacked.baseMutableC2)
+        Assert.assertEquals(obj2, unpacked.baseNullableValueC2)
+        Assert.assertEquals(obj2, unpacked.baseMutable2)
+        Assert.assertEquals(obj2, unpacked.baseNullableValue2)
+        Assert.assertEquals(null, unpacked.baseNullableNullC2)
+        Assert.assertEquals(null, unpacked.baseNullableNull2)
+
+        val obj3 = unpacked.derivedReadonlyC1
+        Assert.assertEquals(obj3, unpacked.derivedMutableC1)
+        Assert.assertEquals(obj3, unpacked.derivedNullableValueC1)
+        Assert.assertEquals(obj3, unpacked.derivedMutable1)
+        Assert.assertEquals(obj3, unpacked.derivedNullableValue1)
+        Assert.assertEquals(null, unpacked.derivedNullableNullC1)
+        Assert.assertEquals(null, unpacked.derivedNullableNull1)
+
+        val obj4 = unpacked.derivedReadonlyC2
+        assert(obj3 != obj4)
+        Assert.assertEquals(obj4, unpacked.derivedMutableC2)
+        Assert.assertEquals(obj4, unpacked.derivedNullableValueC2)
+        Assert.assertEquals(obj4, unpacked.derivedMutable2)
+        Assert.assertEquals(obj4, unpacked.derivedNullableValue2)
+        Assert.assertEquals(null, unpacked.derivedNullableNullC2)
+        Assert.assertEquals(null, unpacked.derivedNullableNull2)
+    }
+
+    @Test
+    fun baseConcretizationTests() {
+        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData3 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData4 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val data = ConcreteData(
+            referencedData1, referencedData1, null, referencedData1,
+            referencedData2, referencedData2, null, referencedData2,
+            referencedData3, referencedData3, null, referencedData3,
+            referencedData4, referencedData4, null, referencedData4
+        ).apply {
+            baseMutable1 = referencedData1
+            baseNullableNull1 = null
+            baseNullableValue1 = referencedData1
+
+            baseMutable2 = referencedData2
+            baseNullableNull2 = null
+            baseNullableValue2 = referencedData2
+
+            derivedMutable1 = referencedData3
+            derivedNullableNull1 = null
+            derivedNullableValue1 = referencedData3
+
+            derivedMutable2 = referencedData4
+            derivedNullableNull2 = null
+            derivedNullableValue2 = referencedData4
+        }
+
+        val session = PackingSession()
+        val pointer = ConcreteData_Packer().pack(data, session) as ReferencePointer
+
+        val unpacked = AbstractData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        val obj1 = unpacked.baseReadonlyC1
+        Assert.assertEquals(obj1, unpacked.baseMutableC1)
+        Assert.assertEquals(obj1, unpacked.baseNullableValueC1)
+        Assert.assertEquals(obj1, unpacked.baseMutable1)
+        Assert.assertEquals(obj1, unpacked.baseNullableValue1)
+        Assert.assertEquals(null, unpacked.baseNullableNullC1)
+        Assert.assertEquals(null, unpacked.baseNullableNull1)
+
+        val obj2 = unpacked.baseReadonlyC2
+        assert(obj1 != obj2)
+        Assert.assertEquals(obj2, unpacked.baseMutableC2)
+        Assert.assertEquals(obj2, unpacked.baseNullableValueC2)
+        Assert.assertEquals(obj2, unpacked.baseMutable2)
+        Assert.assertEquals(obj2, unpacked.baseNullableValue2)
+        Assert.assertEquals(null, unpacked.baseNullableNullC2)
+        Assert.assertEquals(null, unpacked.baseNullableNull2)
+
+        unpacked as ConcreteData
+
+        val obj3 = unpacked.derivedReadonlyC1
+        Assert.assertEquals(obj3, unpacked.derivedMutableC1)
+        Assert.assertEquals(obj3, unpacked.derivedNullableValueC1)
+        Assert.assertEquals(obj3, unpacked.derivedMutable1)
+        Assert.assertEquals(obj3, unpacked.derivedNullableValue1)
+        Assert.assertEquals(null, unpacked.derivedNullableNullC1)
+        Assert.assertEquals(null, unpacked.derivedNullableNull1)
+
+        val obj4 = unpacked.derivedReadonlyC2
+        assert(obj3 != obj4)
+        Assert.assertEquals(obj4, unpacked.derivedMutableC2)
+        Assert.assertEquals(obj4, unpacked.derivedNullableValueC2)
+        Assert.assertEquals(obj4, unpacked.derivedMutable2)
+        Assert.assertEquals(obj4, unpacked.derivedNullableValue2)
+        Assert.assertEquals(null, unpacked.derivedNullableNullC2)
+        Assert.assertEquals(null, unpacked.derivedNullableNull2)
+    }
+}
