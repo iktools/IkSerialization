@@ -16,20 +16,20 @@ class SimpleDataTests {
 
     @Test
     fun enumTests() {
-        val data = EnumData(com.ikcode.serialization.processor.examples.simple.EnumSample.Value1, com.ikcode.serialization.processor.examples.simple.EnumSample.Value2, null, com.ikcode.serialization.processor.examples.simple.EnumSample.Value3).apply {
-            mutable = com.ikcode.serialization.processor.examples.simple.EnumSample.Value4
+        val data = EnumData(EnumSample.Value1, EnumSample.Value2, null, EnumSample.Value3).apply {
+            mutable = EnumSample.Value4
             nullableNull = null
-            nullableValue = com.ikcode.serialization.processor.examples.simple.EnumSample.Value5
+            nullableValue = EnumSample.Value5
         }
         val session = PackingSession()
         val pointer = EnumData_Packer().pack(data, session) as ReferencePointer
         val packed = session.referencedData.first { it.pointer == pointer}.dataMap
 
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value1.ordinal, packed["readonlyC"])
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value2.ordinal, packed["mutableC"])
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value3.ordinal, packed["nullableValueC"])
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value4.ordinal, packed["mutable"])
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value5.ordinal, packed["nullableValue"])
+        assertEquals(EnumSample.Value1.ordinal, packed["readonlyC"])
+        assertEquals(EnumSample.Value2.ordinal, packed["mutableC"])
+        assertEquals(EnumSample.Value3.ordinal, packed["nullableValueC"])
+        assertEquals(EnumSample.Value4.ordinal, packed["mutable"])
+        assertEquals(EnumSample.Value5.ordinal, packed["nullableValue"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -38,18 +38,18 @@ class SimpleDataTests {
             UnpackingSession(session.referencedData)
         )
 
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value1, unpacked.readonlyC)
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value2, unpacked.mutableC)
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value3, unpacked.nullableValueC)
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value4, unpacked.mutable)
-        assertEquals(com.ikcode.serialization.processor.examples.simple.EnumSample.Value5, unpacked.nullableValue)
+        assertEquals(EnumSample.Value1, unpacked.readonlyC)
+        assertEquals(EnumSample.Value2, unpacked.mutableC)
+        assertEquals(EnumSample.Value3, unpacked.nullableValueC)
+        assertEquals(EnumSample.Value4, unpacked.mutable)
+        assertEquals(EnumSample.Value5, unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
 
     @Test
     fun floatTests() {
-        val data = com.ikcode.serialization.processor.examples.simple.FloatData(1f, 2f, null, 3f).apply {
+        val data = FloatData(1f, 2f, null, 3f).apply {
             mutable = 4f
             nullableNull = null
             nullableValue = 5f
@@ -115,8 +115,8 @@ class SimpleDataTests {
 
     @Test
     fun referenceTests() {
-        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData1 = ObjectSample()
+        val referencedData2 = ObjectSample()
         val data = ObjectData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2
@@ -177,7 +177,7 @@ class SimpleDataTests {
 
     @Test
     fun stringTests() {
-        val data = com.ikcode.serialization.processor.examples.simple.StringData("1", "2", null, "3").apply {
+        val data = StringData("1", "2", null, "3").apply {
             mutable = "4"
             nullableNull = null
             nullableValue = "5"

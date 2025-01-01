@@ -4,6 +4,7 @@ import com.ikcode.serialization.processor.examples.collections.IntArrayListData_
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
+import com.ikcode.serialization.processor.examples.collections.IntArrayListData
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -11,7 +12,7 @@ class SimpleArrayListTests {
 
     @Test
     fun intArrayListTests() {
-        val data = com.ikcode.serialization.processor.examples.collections.IntArrayListData(
+        val data = IntArrayListData(
             arrayListOf(1),
             arrayListOf(2),
             null,

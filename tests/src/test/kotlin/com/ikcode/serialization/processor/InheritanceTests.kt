@@ -14,7 +14,7 @@ class InheritanceTests {
     fun interfaceImplementationTests() {
         val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
         val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val data = com.ikcode.serialization.processor.examples.inheritance.ImplementationData(
+        val data = ImplementationData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2
         ).apply {

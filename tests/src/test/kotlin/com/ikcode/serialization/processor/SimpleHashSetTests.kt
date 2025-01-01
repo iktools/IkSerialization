@@ -4,6 +4,7 @@ import com.ikcode.serialization.processor.examples.collections.IntHashSetData_Pa
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
+import com.ikcode.serialization.processor.examples.collections.IntHashSetData
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -11,7 +12,7 @@ class SimpleHashSetTests {
 
     @Test
     fun intHashSetTests() {
-        val data = com.ikcode.serialization.processor.examples.collections.IntHashSetData(
+        val data = IntHashSetData(
             hashSetOf(1),
             hashSetOf(2),
             null,
