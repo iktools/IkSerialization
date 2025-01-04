@@ -13,6 +13,7 @@ abstract class ABuilder(
     abstract fun unpack(funBuilder: FunSpec.Builder)
     abstract fun instantiate(funBuilder: FunSpec.Builder)
     abstract fun fill(funBuilder: FunSpec.Builder)
+    open fun extras(typeBuilder: TypeSpec.Builder) {}
 
     fun file(): FileSpec {
         val packFunc = FunSpec.builder("pack")
@@ -33,7 +34,7 @@ abstract class ABuilder(
             .returns(this.classInfo.kpType)
         this.instantiate(instantiateFunc)
 
-        val fillDataFunc =FunSpec.builder("fillData")
+        val fillDataFunc = FunSpec.builder("fillData")
             .addParameter("obj", this.classInfo.kpType)
             .addParameter("session", UnpackingSession::class)
         this.fill(fillDataFunc)
@@ -43,9 +44,82 @@ abstract class ABuilder(
             .addFunction(unpackFunc.build())
             .addFunction(instantiateFunc.build())
             .addFunction(fillDataFunc.build())
+        this.extras(type)
 
         return FileSpec.builder(this.classInfo.namespace, this.classInfo.outFileName)
             .addType(type.build())
             .build()
     }
+
+    //TODO
+    /*protected fun packType(type: TypeInfo, getValue: String): String = when {
+        type.isPrimitive || type.isBoxedNumber -> getValue
+        type.rawType == "java.util.ArrayList" || type.rawType == "java.util.List" || type.rawType == "java.util.Collection" || type.rawType == "java.lang.Iterable" || type.rawType == "kotlin.collections.List" || type.rawType == "java.util.HashSet" || type.rawType == "java.util.Set" ->
+            "$getValue.map { ${packType(type.genericParams[0], "it")} }.toList()"
+        type.rawType == "java.util.HashMap" || type.rawType == "java.util.Map" ->
+            "$getValue.map { ${packType(type.genericParams[0], "it.key")}·to ${packType(type.genericParams[1], "it.value")} }.toMap()"
+        type.rawType == "kotlin.Pair" ->
+            "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[1], "$getValue.second")})"
+        type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" ->
+            "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[0], "$getValue.second")})"
+        else -> "${type.rawType}_Packer().pack($getValue, session)"
+    }*/
+
+    protected fun instantiateParamFunc(type: TypeInfo, data: String): String = when {
+        type.isNumber -> "($data as Number).to${type.name.asString()}()"
+        type.isMap -> {
+            logger.warn("Pazi sad ${type.name.asString()} ${type.isMap} ${type.isNumber}")
+            "($data as Map<*, *>).map { ${
+                instantiateParamFunc(
+                    type.arguments[0],
+                    "it.key!!"
+                )
+            }·to ${instantiateParamFunc(type.arguments[1], "it.value!!")}}.toMap().toMutableMap()"
+        }
+        type.isPrimitive -> "$data as ${type.name.asString()}"
+        /*type.isBoxedNumber -> "($data as Number).to${TypeInfo.boxedNumbers[type.rawType]}()"
+        */
+        /*type.rawType == "java.util.ArrayList" -> "ArrayList(($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} })"
+        type.rawType == "java.lang.Iterable" || type.rawType == "java.util.Collection" || type.rawType == "kotlin.collections.List" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toList()"
+        type.rawType == "java.util.HashSet" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toHashSet()"
+        type.rawType == "java.util.HashMap" -> "HashMap(($data as Map<*, *>).map { ${instantiateParamFunc(type.genericParams[0], "it.key!!")}·to ${instantiateParamFunc(type.genericParams[1], "it.value!!")}}.toMap())"
+        type.rawType == "java.util.Map" -> "($data as Map<*, *>).map { ${instantiateParamFunc(type.genericParams[0], "it.key!!")}·to ${instantiateParamFunc(type.genericParams[1], "it.value!!")}}.toMap().toMutableMap()"
+        type.rawType == "kotlin.Pair" -> "($data as List<*>).let { Pair(${instantiateParamFunc(type.genericParams[0], "it[0]!!")}, ${instantiateParamFunc(type.genericParams[1], "it[1]!!")}) }"
+        type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" -> "($data as List<*>).let { com.ikcode.ancientstar1.core.util.UnorderedPair(${instantiateParamFunc(type.genericParams[0], "it[0]!!")}, ${instantiateParamFunc(type.genericParams[0], "it[1]!!")}) }"*/
+        else -> {
+            "${type.name.asString()}_Packer().instantiate($data, session)"
+        }
+    }
+
+    //TODO
+    /*protected fun fillParamType(fillFunc: FunSpec.Builder, type: TypeInfo, destination: String) {
+        when(type.rawType) {
+            "java.util.ArrayList", "java.util.Collection", "java.util.HashSet", "java.util.List" -> {
+                fillFunc.beginControlFlow("$destination.forEach { item ->")
+                fillParamType(fillFunc, type.genericParams[0], "item")
+                fillFunc.endControlFlow()
+            }
+            "java.util.Map" -> {
+                fillFunc.beginControlFlow("$destination.entries.forEach { (key, value) ->")
+                if (type.genericParams[0].fillable)
+                    fillParamType(fillFunc, type.genericParams[0], "key")
+                if (type.genericParams[1].fillable)
+                    fillParamType(fillFunc, type.genericParams[1], "value")
+                fillFunc.endControlFlow()
+            }
+            "kotlin.Pair" -> {
+                if (type.genericParams[0].fillable)
+                    fillParamType(fillFunc, type.genericParams[0], "$destination.first")
+                if (type.genericParams[1].fillable)
+                    fillParamType(fillFunc, type.genericParams[1], "$destination.second")
+            }
+            "com.ikcode.ancientstar1.core.util.UnorderedPair" -> {
+                if (type.genericParams[0].fillable)
+                    fillParamType(fillFunc, type.genericParams[0], "$destination.first")
+                if (type.genericParams[0].fillable)
+                    fillParamType(fillFunc, type.genericParams[0], "$destination.second")
+            }
+            else ->  fillFunc.addStatement("${type.rawType}_Packer().fillData($destination, session)")
+        }
+    }*/
 }

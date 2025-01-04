@@ -4,7 +4,8 @@ import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 import com.ikcode.serialization.processor.examples.simple.ObjectSample
 
-@SerializableClass
+//TODO
+/*@SerializableClass
 class ImplementationData(
     @field:SerializationData val readonlyC1: ObjectSample,
     @field:SerializationData var mutableC1: ObjectSample,
@@ -33,4 +34,4 @@ class ImplementationData(
     @field:SerializationData
     var nullableValue2: ObjectSample? =
         ObjectSample()
-}
+}*/

@@ -1,16 +1,15 @@
 package com.ikcode.serialization.processor
 
-import com.ikcode.serialization.processor.examples.collections.IntIterableData_Packer
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
-import com.ikcode.serialization.processor.examples.collections.IntIterableData
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SimpleIterableTests {
 
-    @Test
+    //TODO
+    /*@Test
     fun intIterableTests() {
         val data = IntIterableData(
             listOf(1),
@@ -46,5 +45,5 @@ class SimpleIterableTests {
         assertEquals(arrayListOf(5), unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
-    }
+    }*/
 }

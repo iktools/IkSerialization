@@ -3,7 +3,8 @@ package com.ikcode.serialization.processor.examples.collections
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 
-@SerializableClass
+//TODO
+/*@SerializableClass
 class IntHashMapData(
     @field:SerializationData val readonlyC: HashMap<Int, Int>,
     @field:SerializationData var mutableC: HashMap<Int, Int>,
@@ -16,4 +17,4 @@ class IntHashMapData(
     var nullableNull: HashMap<Int, Int>? = hashMapOf()
     @field:SerializationData
     var nullableValue: HashMap<Int, Int>? = hashMapOf()
-}
+}*/

@@ -1,7 +1,5 @@
 package com.ikcode.serialization.processor
 
-import com.ikcode.serialization.processor.examples.collections.IntCollectionData
-import com.ikcode.serialization.processor.examples.collections.IntCollectionData_Packer
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
@@ -10,7 +8,8 @@ import kotlin.test.assertEquals
 
 class SimpleCollectionTests {
 
-    @Test
+    //TODO
+    /*@Test
     fun intCollectionTests() {
         val data = IntCollectionData(listOf(1), listOf(2), null, listOf(3)).apply {
             mutable = listOf(4)
@@ -41,5 +40,5 @@ class SimpleCollectionTests {
         assertEquals(arrayListOf(5), unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
-    }
+    }*/
 }

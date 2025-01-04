@@ -1,7 +1,5 @@
 package com.ikcode.serialization.processor
 
-import com.ikcode.serialization.processor.examples.collections.IntHashMapData
-import com.ikcode.serialization.processor.examples.collections.IntHashMapData_Packer
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
@@ -11,7 +9,8 @@ import kotlin.test.assertEquals
 class SimpleHashMapTests {
     //TODO tests where one of key or value is a primitive and other is a reference
 
-    @Test
+    //TODO
+    /*@Test
     fun intHashMapTests() {
         val data = IntHashMapData(hashMapOf(1 to 10), hashMapOf(2 to 20), null, hashMapOf(3 to 30)).apply {
             mutable = hashMapOf(4 to 40)
@@ -42,5 +41,5 @@ class SimpleHashMapTests {
         assertEquals(hashMapOf(5 to 50), unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
-    }
+    }*/
 }

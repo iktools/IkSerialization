@@ -1,8 +1,11 @@
 package com.ikcode.serialization.processor
 
+import com.google.devtools.ksp.processing.Resolver
 import com.squareup.kotlinpoet.FunSpec
 
-class EnumBuilder(classInfo: PackerInfo): ABuilder(classInfo) {
+class EnumBuilder(
+    classInfo: PackerInfo
+): ABuilder(classInfo) {
     override fun pack(funBuilder: FunSpec.Builder) {
         funBuilder.addStatement("return obj.ordinal")
     }

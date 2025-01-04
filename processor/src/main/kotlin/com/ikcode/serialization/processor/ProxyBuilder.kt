@@ -1,9 +1,11 @@
 package com.ikcode.serialization.processor
 
+import com.google.devtools.ksp.processing.Resolver
 import com.squareup.kotlinpoet.FunSpec
 
-//TODO remove
-class TodoBuilder(classInfo: PackerInfo): ABuilder(classInfo) {
+class ProxyBuilder(
+    classInfo: PackerInfo
+): ABuilder(classInfo) {
     override fun pack(funBuilder: FunSpec.Builder) {
         funBuilder.addStatement("TODO()")
     }

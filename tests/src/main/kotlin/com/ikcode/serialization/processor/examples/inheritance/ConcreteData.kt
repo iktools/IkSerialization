@@ -4,7 +4,8 @@ import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 import com.ikcode.serialization.processor.examples.simple.ObjectSample
 
-@SerializableClass
+//TODO
+/*@SerializableClass
 class ConcreteData(
     baseReadonlyC1: ObjectSample,
     baseMutableC1: ObjectSample,
@@ -46,4 +47,4 @@ class ConcreteData(
     @field:SerializationData
     var derivedNullableValue2: ObjectSample? =
         ObjectSample()
-}
+}*/

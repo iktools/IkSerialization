@@ -1,25 +1,16 @@
 package com.ikcode.serialization.processor
 
-import com.google.devtools.ksp.getClassDeclarationByName
-import com.google.devtools.ksp.processing.Dependencies
-import com.google.devtools.ksp.processing.Resolver
-import com.google.devtools.ksp.processing.SymbolProcessor
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.*
+import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.validate
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.session.IProxyPacked
-import com.ikcode.serialization.core.session.PackingSession
-import com.ikcode.serialization.core.session.UnpackingSession
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.TypeSpec
-import java.io.File
-import kotlin.reflect.typeOf
+
+lateinit var logger: KSPLogger
 
 class SerializableProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
+    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver
             .getSymbolsWithAnnotation(SerializableClass::class.java.canonicalName)
@@ -28,22 +19,23 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
         if (!symbols.iterator().hasNext())
             return emptyList()
 
-        val proxyType = resolver
-            .getClassDeclarationByName(IProxyPacked::class.qualifiedName!!)!!
-            .asStarProjectedType()
+        val types = TypeUtil(resolver)
+
+        logger = environment.logger
         val packers = symbols.map {
-            environment.logger.warn("${it.qualifiedName?.asString()} is ${it.classKind}")
-            PackerInfo(it, proxyType)
+            PackerInfo(it, types)
         }
 
+        val allSourceFiles = resolver.getAllFiles().toList().toTypedArray()
         packers.forEach { packer ->
             val fileText = when {
                 packer.isEnum -> EnumBuilder(packer)
-                else -> TodoBuilder(packer)
+                packer.isProxy -> ProxyBuilder(packer)
+                else -> StandardBuilder(packer)
             }.file()
 
             val file = environment.codeGenerator.createNewFile(
-                dependencies = Dependencies(false /*, *resolver.getAllFiles().toList().toTypedArray()*/),
+                dependencies = Dependencies(false, *allSourceFiles),
                 packageName = packer .namespace,
                 fileName = packer.outFileName
             )
