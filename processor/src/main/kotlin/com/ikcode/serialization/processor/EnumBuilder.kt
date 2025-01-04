@@ -1,6 +1,5 @@
 package com.ikcode.serialization.processor
 
-import com.google.devtools.ksp.processing.Resolver
 import com.squareup.kotlinpoet.FunSpec
 
 class EnumBuilder(

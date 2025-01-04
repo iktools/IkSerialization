@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.KSType
 open class TypeInfo(type: KSType, types: TypeUtil) {
     val name = type.declaration.simpleName
     val arguments = type.arguments.map { types[it.type!!.resolve()] }
+    val isNullable = type.isMarkedNullable
 
     private val justType = type.starProjection().makeNotNullable()
 

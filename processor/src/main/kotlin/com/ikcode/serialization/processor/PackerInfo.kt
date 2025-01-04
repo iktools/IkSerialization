@@ -31,4 +31,7 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil) {
     }.map {
         PropertyInfo(it, types)
     }.toList()
+
+    //TODO
+    val referenceOnlyFields = emptyList<PropertyInfo>()
 }

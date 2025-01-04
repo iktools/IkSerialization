@@ -52,23 +52,22 @@ abstract class ABuilder(
     }
 
     //TODO
-    /*protected fun packType(type: TypeInfo, getValue: String): String = when {
-        type.isPrimitive || type.isBoxedNumber -> getValue
-        type.rawType == "java.util.ArrayList" || type.rawType == "java.util.List" || type.rawType == "java.util.Collection" || type.rawType == "java.lang.Iterable" || type.rawType == "kotlin.collections.List" || type.rawType == "java.util.HashSet" || type.rawType == "java.util.Set" ->
+    protected fun packType(type: TypeInfo, getValue: String): String = when {
+        type.isPrimitive -> getValue
+        /*type.rawType == "java.util.ArrayList" || type.rawType == "java.util.List" || type.rawType == "java.util.Collection" || type.rawType == "java.lang.Iterable" || type.rawType == "kotlin.collections.List" || type.rawType == "java.util.HashSet" || type.rawType == "java.util.Set" ->
             "$getValue.map { ${packType(type.genericParams[0], "it")} }.toList()"
         type.rawType == "java.util.HashMap" || type.rawType == "java.util.Map" ->
             "$getValue.map { ${packType(type.genericParams[0], "it.key")}·to ${packType(type.genericParams[1], "it.value")} }.toMap()"
         type.rawType == "kotlin.Pair" ->
             "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[1], "$getValue.second")})"
         type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" ->
-            "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[0], "$getValue.second")})"
-        else -> "${type.rawType}_Packer().pack($getValue, session)"
-    }*/
+            "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[0], "$getValue.second")})"*/
+        else -> "${type.name.asString()}_Packer().pack($getValue, session)"
+    }
 
     protected fun instantiateParamFunc(type: TypeInfo, data: String): String = when {
         type.isNumber -> "($data as Number).to${type.name.asString()}()"
         type.isMap -> {
-            logger.warn("Pazi sad ${type.name.asString()} ${type.isMap} ${type.isNumber}")
             "($data as Map<*, *>).map { ${
                 instantiateParamFunc(
                     type.arguments[0],
@@ -77,8 +76,6 @@ abstract class ABuilder(
             }·to ${instantiateParamFunc(type.arguments[1], "it.value!!")}}.toMap().toMutableMap()"
         }
         type.isPrimitive -> "$data as ${type.name.asString()}"
-        /*type.isBoxedNumber -> "($data as Number).to${TypeInfo.boxedNumbers[type.rawType]}()"
-        */
         /*type.rawType == "java.util.ArrayList" -> "ArrayList(($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} })"
         type.rawType == "java.lang.Iterable" || type.rawType == "java.util.Collection" || type.rawType == "kotlin.collections.List" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toList()"
         type.rawType == "java.util.HashSet" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toHashSet()"

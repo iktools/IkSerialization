@@ -5,12 +5,11 @@ import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.ikcode.serialization.core.annotations.SerializableClass
-import com.ikcode.serialization.core.session.IProxyPacked
 
+//TODO remove
 lateinit var logger: KSPLogger
 
 class SerializableProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
-    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver
             .getSymbolsWithAnnotation(SerializableClass::class.java.canonicalName)

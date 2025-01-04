@@ -5,15 +5,15 @@ import com.ikcode.serialization.core.annotations.SerializationData
 
 @SerializableClass
 class StringData(
-    @field:SerializationData val readonlyC: String,
-    @field:SerializationData var mutableC: String,
-    @field:SerializationData val nullableNullC: String?,
-    @field:SerializationData val nullableValueC: String?,
+    @SerializationData val readonlyC: String,
+    @SerializationData var mutableC: String,
+    @SerializationData val nullableNullC: String?,
+    @SerializationData val nullableValueC: String?,
 ) {
-    @field:SerializationData
+    @SerializationData
     var mutable = ""
-    @field:SerializationData
+    @SerializationData
     var nullableNull: String? = ""
-    @field:SerializationData
+    @SerializationData
     var nullableValue: String? = ""
 }

@@ -5,15 +5,15 @@ import com.ikcode.serialization.core.annotations.SerializationData
 
 @SerializableClass
 class FloatData(
-    @field:SerializationData val readonlyC: Float,
-    @field:SerializationData var mutableC: Float,
-    @field:SerializationData val nullableNullC: Float?,
-    @field:SerializationData val nullableValueC: Float?,
+    @SerializationData val readonlyC: Float,
+    @SerializationData var mutableC: Float,
+    @SerializationData val nullableNullC: Float?,
+    @SerializationData val nullableValueC: Float?,
 ) {
-    @field:SerializationData
+    @SerializationData
     var mutable = 0f
-    @field:SerializationData
+    @SerializationData
     var nullableNull: Float? = 0f
-    @field:SerializationData
+    @SerializationData
     var nullableValue: Float? = 0f
 }
