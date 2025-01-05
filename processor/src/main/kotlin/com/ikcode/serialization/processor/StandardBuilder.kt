@@ -63,15 +63,15 @@ class StandardBuilder(
                 code.append(classInfo.constructorParams
                     .joinToString(", ") { paramName ->
                         val field = classInfo.allProperties.firstOrNull {
-                            paramName.name == it.name
+                            paramName.name == it.ksName
                         }!!
 
                         val instantiation = instantiateParamFunc(
                             field.type,
-                            "objData[\"${field.name.asString()}\"]!!"
+                            "objData[\"${field.name}\"]!!"
                         )
                         if (field.type.isNullable)
-                            "if (objData.containsKey(\"${field.name.asString()}\")) $instantiation else null"
+                            "if (objData.containsKey(\"${field.name}\")) $instantiation else null"
                         else
                             instantiation
                     })
@@ -97,10 +97,33 @@ class StandardBuilder(
             funBuilder.addModifiers(KModifier.OVERRIDE)
                 .addStatement("obj as $this.classInfo.kpType")
         }
-        //TODO
-        classInfo.allProperties.forEach { field ->
-            val inConstructor = classInfo.constructorParams.any { it.name == field.name }
-            when {
+
+        classInfo.allProperties.filter { field ->
+            field.isMutable || field.inConstructor
+        }.forEach { field ->
+            val instantiate = field.isMutable && !field.inConstructor
+            val fill = !field.type.isPrimitive
+
+            funBuilder.addComment("TODO $instantiate $fill ${field.type.isNullable}")
+            //TODO remove empty blocks for enums
+            if (field.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.contains(\"${field.name}\"))")
+
+            fillParamType(funBuilder, field.type, "obj.${field.name}", "objData[\"${field.name}\"]!!", instantiate, fill)
+
+            //TODO
+            /*when {
+                /*field.type.isPrimitive -> {
+                    when {
+                        field.inConstructor -> { /* no operation */ }
+                        field.type.isNumber -> funBuilder.addStatement(
+                            "obj.${field.name} = (objData[\"${field.name}\"] as Number).to${field.type.name}()"
+                        )
+                        else -> funBuilder.addStatement(
+                            "obj.${field.name} = objData[\"${field.name}\"] as ${field.type.name}"
+                        )
+                    }
+                }*/
                 /*field.type.rawType = "java.util.Collection", "java.lang.Iterable" -> {
                     if (!classInfo.constructorFields.contains(field)) {
                         if (field.isNullable)
@@ -187,52 +210,30 @@ class StandardBuilder(
                         fillFunc.endControlFlow()
                     }
                 }*/
-                field.type.isPrimitive -> {
-                    if (field.type.isNullable)
-                        funBuilder.beginControlFlow("if (objData.contains(\"${field.name.asString()}\"))")
-
-                    when {
-                        inConstructor -> { /* no operation */ }
-                        field.type.isNumber -> funBuilder.addStatement(
-                            "obj.${field.name.asString()} = (objData[\"${field.name.asString()}\"] as Number).to${field.type.name.asString()}()"
-                        )
-                        else -> funBuilder.addStatement(
-                            "obj.${field.name.asString()} = objData[\"${field.name.asString()}\"] as ${field.type.name.asString()}"
-                        )
-                    }
-                    if (field.type.isNullable) {
-                        funBuilder.endControlFlow()
-                        if (!inConstructor)
-                            funBuilder.addStatement("else obj.${field.name.asString()} = null")
-                    }
+                field.isMutable && !field.inConstructor -> {
+                    funBuilder.addStatement("obj.${field.name} = ${field.type.name}_Packer().unpack(objData[\"${field.name}\"]!!, session)")
                 }
-                field.isMutable && !inConstructor -> {
-                    if (field.type.isNullable)
-                        funBuilder.beginControlFlow("if (objData.contains(\"${field.name.asString()}\"))")
-                    funBuilder.addStatement("obj.${field.name.asString()} = ${field.type.name.asString()}_Packer().unpack(objData[\"${field.name.asString()}\"]!!, session)")
-                    if (field.type.isNullable) {
-                        funBuilder.endControlFlow()
-                        funBuilder.addStatement("else obj.${field.name.asString()} = null")
-                    }
-                }
-                !field.isMutable && !inConstructor -> {
+                !field.isMutable && !field.inConstructor -> {
                     // no op, handled in instantiate
                 }
                 else -> {
-                    var getValue = "obj.${field.name.asString()}"
+                    var getValue = "obj.${field.name}"
                     if (field.type.isNullable) {
-                        getValue = field.name.asString()
-                        funBuilder.addStatement("val ${field.name.asString()} = obj.${field.name.asString()}")
-                        funBuilder.beginControlFlow("if (${field.name.asString()} != null)")
+                        getValue = field.name
+                        funBuilder.addStatement("val ${field.name} = obj.${field.name}")
+                        funBuilder.beginControlFlow("if (${field.name} != null)")
                     }
-                    if (!inConstructor)
-                        funBuilder.addStatement("session.rememberInstance($getValue, (objData[\"${field.name.asString()}\"]!! as %T).name)", ReferencePointer::class)
+                    if (!field.inConstructor)
+                        funBuilder.addStatement("session.rememberInstance($getValue, (objData[\"${field.name}\"]!! as %T).name)", ReferencePointer::class)
 
-                    funBuilder.addStatement("${field.type.name.asString()}_Packer().fillData($getValue, session)")
-
-                    if (field.type.isNullable)
-                        funBuilder.endControlFlow()
+                    funBuilder.addStatement("${field.type.name}_Packer().fillData($getValue, session)")
                 }
+            }*/
+
+            if (field.type.isNullable) {
+                funBuilder.endControlFlow()
+                if (!field.inConstructor)
+                    funBuilder.addStatement("else obj.${field.name} = null")
             }
         }
         /*if (subclasses.any()) {
@@ -260,7 +261,7 @@ class StandardBuilder(
                 .addStatement("obj as $targetClass")
         }*/
         for (field in classInfo.ownProperties) {
-            val name = field.name.asString()
+            val name = field.name
 
             val getValue = if (field.isMutable && field.type.isNullable)
                 name.also { packOwnFunc.addStatement("val $name = obj.$name") }
@@ -271,7 +272,7 @@ class StandardBuilder(
                 packOwnFunc.beginControlFlow("if ($getValue != null)")
 
             if (field in classInfo.referenceOnlyFields)
-                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, ${field.type.name.asString()}_Packer().typeName(), obj)")
+                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, ${field.type.name}_Packer().typeName(), obj)")
             else
                 packOwnFunc.addStatement("packMap[\"$name\"] = ${this.packType(field.type, getValue)}")
 

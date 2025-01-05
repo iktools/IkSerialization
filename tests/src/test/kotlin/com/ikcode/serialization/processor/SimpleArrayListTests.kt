@@ -3,13 +3,14 @@ package com.ikcode.serialization.processor
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
+import com.ikcode.serialization.processor.examples.collections.IntArrayListData
+import com.ikcode.serialization.processor.examples.collections.IntArrayListData_Packer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SimpleArrayListTests {
 
-    //TODO
-    /*@Test
+    @Test
     fun intArrayListTests() {
         val data = IntArrayListData(
             arrayListOf(1),
@@ -46,5 +47,5 @@ class SimpleArrayListTests {
         assertEquals(arrayListOf(5), unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
-    }*/
+    }
 }

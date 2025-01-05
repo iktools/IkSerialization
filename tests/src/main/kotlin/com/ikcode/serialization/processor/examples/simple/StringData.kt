@@ -10,10 +10,7 @@ class StringData(
     @SerializationData val nullableNullC: String?,
     @SerializationData val nullableValueC: String?,
 ) {
-    @SerializationData
-    var mutable = ""
-    @SerializationData
-    var nullableNull: String? = ""
-    @SerializationData
-    var nullableValue: String? = ""
+    @SerializationData var mutable = ""
+    @SerializationData var nullableNull: String? = ""
+    @SerializationData var nullableValue: String? = ""
 }

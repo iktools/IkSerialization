@@ -19,17 +19,19 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil) {
     val outFileName = this.name + "_Packer"
 
     val constructorParams = declaration.primaryConstructor?.parameters ?: listOf()
+
     @OptIn(KspExperimental::class)
     val ownProperties = declaration.getDeclaredProperties().filter {
         it.isAnnotationPresent(SerializationData::class)
     }.map {
-        PropertyInfo(it, types)
+        PropertyInfo(it, types, this.constructorParams.any { param -> param.name == it.simpleName })
     }.toList()
+
     @OptIn(KspExperimental::class)
     val allProperties = declaration.getAllProperties().filter {
         it.isAnnotationPresent(SerializationData::class)
     }.map {
-        PropertyInfo(it, types)
+        PropertyInfo(it, types, this.constructorParams.any { param -> param.name == it.simpleName })
     }.toList()
 
     //TODO

@@ -10,10 +10,7 @@ class FloatData(
     @SerializationData val nullableNullC: Float?,
     @SerializationData val nullableValueC: Float?,
 ) {
-    @SerializationData
-    var mutable = 0f
-    @SerializationData
-    var nullableNull: Float? = 0f
-    @SerializationData
-    var nullableValue: Float? = 0f
+    @SerializationData var mutable = 0f
+    @SerializationData var nullableNull: Float? = 0f
+    @SerializationData var nullableValue: Float? = 0f
 }
