@@ -63,12 +63,12 @@ abstract class ABuilder(
             "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[1], "$getValue.second")})"
         type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" ->
             "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[0], "$getValue.second")})"*/
-        else -> "${type.name}_Packer().pack($getValue, session)"
+        else -> "${type.fullName}_Packer().pack($getValue, session)"
     }
 
     protected fun instantiateParamFunc(type: TypeInfo, data: String): String = when {
         type.isNumber -> "($data as Number).to${type.name}()"
-        type.isPrimitive -> "$data as ${type.name}"
+        type.isPrimitive -> "$data as ${type.fullName}"
         type.isMap ->
             "($data as Map<*, *>).map { ${
                 instantiateParamFunc(
@@ -76,7 +76,7 @@ abstract class ABuilder(
                     "it.key!!"
                 )
             }·to ${instantiateParamFunc(type.arguments[1], "it.value!!")}}.toMap().toMutableMap()"
-        type.isCollection -> "${type.name}(($data as Collection<${type.arguments[0].name}>).map { ${instantiateParamFunc(type.arguments[0], "it!!")} })"
+        type.isCollection -> "${type.name}(($data as Collection<${type.arguments[0].fullName}>).map { ${instantiateParamFunc(type.arguments[0], "it!!")} })"
         //TODO
         /*type.rawType == "java.util.ArrayList" -> "ArrayList(($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} })"
         type.rawType == "java.lang.Iterable" || type.rawType == "java.util.Collection" || type.rawType == "kotlin.collections.List" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toList()"
@@ -86,24 +86,26 @@ abstract class ABuilder(
         type.rawType == "kotlin.Pair" -> "($data as List<*>).let { Pair(${instantiateParamFunc(type.genericParams[0], "it[0]!!")}, ${instantiateParamFunc(type.genericParams[1], "it[1]!!")}) }"
         type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" -> "($data as List<*>).let { com.ikcode.ancientstar1.core.util.UnorderedPair(${instantiateParamFunc(type.genericParams[0], "it[0]!!")}, ${instantiateParamFunc(type.genericParams[0], "it[1]!!")}) }"*/
         else -> {
-            "${type.name}_Packer().instantiate($data, session)"
+            "${type.fullName}_Packer().instantiate($data, session)"
         }
     }
 
-    protected fun fillParamType(fillFunc: FunSpec.Builder, type: TypeInfo, destination: String, data: String, instantiate: Boolean, fill: Boolean) {
+    protected fun fillParamType(fillFunc: FunSpec.Builder, type: TypeInfo, destination: String, data: String, assign: Boolean, instantiate: Boolean, fill: Boolean) {
         val nullAssert = if (type.isNullable) "!!" else ""
 
         when {
+            assign -> {
+                fillFunc.addStatement("$destination = ")
+                fillParamType(fillFunc, type, destination, data, false, instantiate, fill)
+            }
             type.isPrimitive -> if (instantiate)
-                fillFunc.addStatement("$destination = ${unpackCall(type, data)}")
+                fillFunc.addStatement("$data as ${type.name}")
             type.isCollection -> if (instantiate) {
                 if (type.concrete)
-                    fillFunc.addStatement("$destination = ${type.name}(")
-                else
-                    fillFunc.addStatement("$destination = ")
+                    fillFunc.addStatement("${type.fullName}(")
 
                 fillFunc.beginControlFlow("($data as List<*>).map { itemData ->")
-                fillFunc.addStatement(unpackCall(type.arguments[0], "itemData!!"))
+                fillParamType(fillFunc, type.arguments[0], "", "itemData!!", false, true, true)
                 fillFunc.endControlFlow()
 
                 if (type.concrete)
@@ -140,12 +142,8 @@ abstract class ABuilder(
                 if (type.genericParams[0].fillable)
                     fillParamType(fillFunc, type.genericParams[0], "$destination.second")
             }*/
-            instantiate && fill -> fillFunc.addStatement("$destination = ${unpackCall(type, data)}")
-            fill && !type.isEnum -> fillFunc.addStatement("${type.name}_Packer().fillData($destination$nullAssert, session)")
+            instantiate && fill -> fillFunc.addStatement("${type.fullName}_Packer().unpack($data, session)")
+            fill && !type.isEnum -> fillFunc.addStatement("${type.fullName}_Packer().fillData($destination$nullAssert, session)")
         }
-    }
-    private fun unpackCall(type: TypeInfo, data: String) = when {
-        type.isPrimitive -> "$data as ${type.name}"
-        else -> "${type.name}_Packer().unpack($data, session)"
     }
 }

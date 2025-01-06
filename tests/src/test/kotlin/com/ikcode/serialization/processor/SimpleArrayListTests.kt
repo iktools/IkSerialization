@@ -5,6 +5,10 @@ import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
 import com.ikcode.serialization.processor.examples.collections.IntArrayListData
 import com.ikcode.serialization.processor.examples.collections.IntArrayListData_Packer
+import com.ikcode.serialization.processor.examples.collections.ObjectArrayListData
+import com.ikcode.serialization.processor.examples.collections.ObjectArrayListData_Packer
+import com.ikcode.serialization.processor.examples.simple.ObjectData
+import com.ikcode.serialization.processor.examples.simple.ObjectSample
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,6 +49,62 @@ class SimpleArrayListTests {
         assertEquals(arrayListOf(3), unpacked.nullableValueC)
         assertEquals(arrayListOf(4), unpacked.mutable)
         assertEquals(arrayListOf(5), unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
+    fun objectArrayListTests() {
+        val referencedData1 = ObjectSample()
+        val referencedData2 = ObjectSample()
+        val referencedData3 = ObjectSample()
+        val referencedData4 = ObjectSample()
+        val referencedData5 = ObjectSample()
+
+        val data = ObjectArrayListData(
+            arrayListOf(referencedData1),
+            arrayListOf(referencedData2),
+            null,
+            arrayListOf(referencedData3)
+        )
+            .apply {
+                mutable = arrayListOf(referencedData4)
+                nullableNull = null
+                nullableValue = arrayListOf(referencedData5)
+            }
+        val session = PackingSession()
+        val pointer = ObjectArrayListData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        val reference1 = (packed["readonlyC"] as List<*>)[0] as ReferencePointer
+        val reference2 = (packed["mutableC"] as List<*>)[0] as ReferencePointer
+        val reference3 = (packed["nullableValueC"] as List<*>)[0] as ReferencePointer
+        val reference4 = (packed["mutable"] as List<*>)[0] as ReferencePointer
+        val reference5 = (packed["nullableValue"] as List<*>)[0] as ReferencePointer
+        assert(reference1.name.startsWith("ObjectSample"))
+        assert(reference2.name.startsWith("ObjectSample"))
+        assert(reference3.name.startsWith("ObjectSample"))
+        assert(reference4.name.startsWith("ObjectSample"))
+        assert(reference5.name.startsWith("ObjectSample"))
+
+        assertEquals(listOf(reference1), packed["readonlyC"])
+        assertEquals(listOf(reference2), packed["mutableC"])
+        assertEquals(listOf(reference3), packed["nullableValueC"])
+        assertEquals(listOf(reference4), packed["mutable"])
+        assertEquals(listOf(reference5), packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = ObjectArrayListData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(arrayListOf(ObjectSample()), unpacked.readonlyC)
+        assertEquals(arrayListOf(ObjectSample()), unpacked.mutableC)
+        assertEquals(arrayListOf(ObjectSample()), unpacked.nullableValueC)
+        assertEquals(arrayListOf(ObjectSample()), unpacked.mutable)
+        assertEquals(arrayListOf(ObjectSample()), unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }

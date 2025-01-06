@@ -6,6 +6,7 @@ import com.google.devtools.ksp.symbol.KSType
 
 open class TypeInfo(type: KSType, types: TypeUtil) {
     val name = type.declaration.simpleName.asString()
+    val fullName = type.declaration.qualifiedName?.asString() ?: throw Exception("Local declaration is not supported")
     val arguments = type.arguments.map { types[it.type!!.resolve()] }
     val isNullable = type.isMarkedNullable
 

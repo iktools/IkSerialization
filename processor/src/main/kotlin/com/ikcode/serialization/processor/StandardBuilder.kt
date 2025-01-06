@@ -109,7 +109,7 @@ class StandardBuilder(
             if (field.type.isNullable)
                 funBuilder.beginControlFlow("if (objData.contains(\"${field.name}\"))")
 
-            fillParamType(funBuilder, field.type, "obj.${field.name}", "objData[\"${field.name}\"]!!", instantiate, fill)
+            fillParamType(funBuilder, field.type, "obj.${field.name}", "objData[\"${field.name}\"]!!", instantiate, instantiate, fill)
 
             //TODO
             /*when {
@@ -272,7 +272,7 @@ class StandardBuilder(
                 packOwnFunc.beginControlFlow("if ($getValue != null)")
 
             if (field in classInfo.referenceOnlyFields)
-                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, ${field.type.name}_Packer().typeName(), obj)")
+                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, ${field.type.fullName}_Packer().typeName(), obj)")
             else
                 packOwnFunc.addStatement("packMap[\"$name\"] = ${this.packType(field.type, getValue)}")
 
