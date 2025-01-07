@@ -1,7 +1,8 @@
-package com.ikcode.serialization.processor
+package com.ikcode.serialization.processor.builders
 
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
+import com.ikcode.serialization.processor.PackerInfo
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 

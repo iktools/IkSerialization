@@ -1,6 +1,7 @@
-package com.ikcode.serialization.processor
+package com.ikcode.serialization.processor.builders
 
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.ikcode.serialization.processor.types.TypeUtil
 
 class PropertyInfo(property: KSPropertyDeclaration, types: TypeUtil, val inConstructor: Boolean) {
     val ksName = property.simpleName

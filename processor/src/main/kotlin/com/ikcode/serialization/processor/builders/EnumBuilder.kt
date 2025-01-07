@@ -1,5 +1,6 @@
-package com.ikcode.serialization.processor
+package com.ikcode.serialization.processor.builders
 
+import com.ikcode.serialization.processor.PackerInfo
 import com.squareup.kotlinpoet.FunSpec
 
 class EnumBuilder(

@@ -1,7 +1,9 @@
-package com.ikcode.serialization.processor
+package com.ikcode.serialization.processor.builders
 
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
+import com.ikcode.serialization.processor.PackerInfo
+import com.ikcode.serialization.processor.types.ATypeInfo
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
@@ -51,7 +53,7 @@ abstract class ABuilder(
             .build()
     }
 
-    protected fun packType(type: TypeInfo, getValue: String): String = when {
+    protected fun packType(type: ATypeInfo, getValue: String): String = when {
         type.isPrimitive -> getValue
         type.isCollection -> "$getValue.map { ${packType(type.arguments[0], "it")} }.toList()"
         //TODO
@@ -66,7 +68,7 @@ abstract class ABuilder(
         else -> "${type.fullName}_Packer().pack($getValue, session)"
     }
 
-    protected fun instantiateParamFunc(type: TypeInfo, data: String): String = when {
+    protected fun instantiateParamFunc(type: ATypeInfo, data: String): String = when {
         type.isNumber -> "($data as Number).to${type.name}()"
         type.isPrimitive -> "$data as ${type.fullName}"
         type.isMap ->
@@ -90,7 +92,7 @@ abstract class ABuilder(
         }
     }
 
-    protected fun fillParamType(fillFunc: FunSpec.Builder, type: TypeInfo, destination: String, data: String, assign: Boolean, instantiate: Boolean, fill: Boolean) {
+    protected fun fillParamType(fillFunc: FunSpec.Builder, type: ATypeInfo, destination: String, data: String, assign: Boolean, instantiate: Boolean, fill: Boolean) {
         val nullAssert = if (type.isNullable) "!!" else ""
 
         when {

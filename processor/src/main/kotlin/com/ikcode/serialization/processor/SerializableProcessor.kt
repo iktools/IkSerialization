@@ -5,6 +5,10 @@ import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.ikcode.serialization.core.annotations.SerializableClass
+import com.ikcode.serialization.processor.builders.EnumBuilder
+import com.ikcode.serialization.processor.builders.ProxyBuilder
+import com.ikcode.serialization.processor.builders.StandardBuilder
+import com.ikcode.serialization.processor.types.TypeUtil
 
 //TODO remove
 lateinit var logger: KSPLogger

@@ -1,4 +1,4 @@
-package com.ikcode.serialization.processor
+package com.ikcode.serialization.processor.types
 
 import com.google.devtools.ksp.findActualType
 import com.google.devtools.ksp.getClassDeclarationByName
@@ -33,7 +33,7 @@ class TypeUtil(
         .getClassDeclarationByName<Map<*, *>>()!!
         .asStarProjectedType()
 
-    operator fun get(type: KSType) = TypeInfo(type, this)
+    operator fun get(type: KSType) = ATypeInfo(type, this)
 
     fun resolve(declaration: KSDeclaration): KSClassDeclaration? = when(declaration) {
         is KSClassDeclaration -> declaration

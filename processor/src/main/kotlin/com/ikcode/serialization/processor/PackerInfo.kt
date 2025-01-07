@@ -6,6 +6,8 @@ import com.google.devtools.ksp.isAnnotationPresent
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.ikcode.serialization.core.annotations.SerializationData
+import com.ikcode.serialization.processor.builders.PropertyInfo
+import com.ikcode.serialization.processor.types.TypeUtil
 import com.squareup.kotlinpoet.ksp.toClassName
 
 class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil) {
