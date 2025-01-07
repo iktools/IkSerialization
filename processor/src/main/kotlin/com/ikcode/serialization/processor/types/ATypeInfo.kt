@@ -1,14 +1,16 @@
 package com.ikcode.serialization.processor.types
 
-import com.google.devtools.ksp.getConstructors
-import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSType
 
 abstract class ATypeInfo(ksType: KSType) {
     val name = ksType.declaration.simpleName.asString()
-    val fullName = ksType.declaration.qualifiedName?.asString() ?: throw Exception("Local declaration is not supported")
-    //val arguments = ksType.arguments.map { types[it.type!!.resolve()] }
+    //val fullName = ksType.declaration.qualifiedName?.asString() ?: throw Exception("Local declaration is not supported")
     val isNullable = ksType.isMarkedNullable
+
+    abstract fun instantiate(data: String): String
+
+    //val arguments = ksType.arguments.map { types[it.type!!.resolve()] }
+
 
     /*private val justType = type.starProjection().makeNotNullable()
     private val classDeclaration = types.resolve(type.declaration)

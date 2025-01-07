@@ -3,8 +3,8 @@ package com.ikcode.serialization.processor.types
 import com.google.devtools.ksp.findActualType
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeAlias
 import com.ikcode.serialization.core.session.IProxyPacked
@@ -33,11 +33,20 @@ class TypeUtil(
         .getClassDeclarationByName<Map<*, *>>()!!
         .asStarProjectedType()
 
-    operator fun get(type: KSType) = ATypeInfo(type, this)
+    operator fun get(type: KSType): ATypeInfo {
+        val justType = type.starProjection().makeNotNullable()
+        val declaration = type.declaration
+        val classDeclaration = when(declaration) {
+            is KSClassDeclaration -> declaration
+            is KSTypeAlias -> declaration.findActualType()
+            else -> null
+        }
 
-    fun resolve(declaration: KSDeclaration): KSClassDeclaration? = when(declaration) {
-        is KSClassDeclaration -> declaration
-        is KSTypeAlias -> declaration.findActualType()
-        else -> null
+        return when {
+            justType in this.primitives -> PrimitiveInfo(type)
+            classDeclaration?.classKind == ClassKind.ENUM_CLASS -> EnumInfo(type)
+            else -> throw Exception("Unsupported type category for type ${type.declaration.qualifiedName?.asString() ?: type.declaration.simpleName.asString()}")
+        }
     }
+
 }

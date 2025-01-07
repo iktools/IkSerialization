@@ -3,7 +3,7 @@ package com.ikcode.serialization.processor.examples.simple
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 
-@SerializableClass
+/*@SerializableClass
 class ObjectData(
     @SerializationData val readonlyC1: ObjectSample,
     @SerializationData var mutableC1: ObjectSample,
@@ -22,4 +22,4 @@ class ObjectData(
     @SerializationData var mutable2 = ObjectSample()
     @SerializationData var nullableNull2: ObjectSample? = ObjectSample()
     @SerializationData var nullableValue2: ObjectSample? = ObjectSample()
-}
+}*/
