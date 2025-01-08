@@ -46,7 +46,7 @@ class TypeUtil(
             justType in this.numbers -> NumberInfo(type)
             justType in this.primitives -> PrimitiveInfo(type)
             classDeclaration?.classKind == ClassKind.ENUM_CLASS -> EnumInfo(type)
-            else -> throw Exception("Unsupported type category for type ${type.declaration.qualifiedName?.asString() ?: type.declaration.simpleName.asString()}")
+            else -> ClassInfo(type)
         }
     }
 

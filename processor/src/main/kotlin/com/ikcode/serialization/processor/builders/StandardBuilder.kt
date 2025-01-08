@@ -73,14 +73,16 @@ class StandardBuilder(
                     val field = classInfo.allProperties.firstOrNull {
                         paramName.name == it.ksName
                     }!!
-                    val instantiation = field.type.instantiate("objData[\"${field.name}\"]!!")
+                    val data = "objData[\"${field.name}\"]!!"
+                    //val instantiation = field.type.instantiate(data)
 
-                    code.add(
-                        if (field.type.isNullable)
-                            "if (objData.containsKey(\"${field.name}\")) $instantiation else null"
-                        else
-                            instantiation
-                    )
+                    if (field.type.isNullable)
+                        code.add("if (objData.containsKey(\"${field.name}\")) ")
+
+                    field.type.instantiate(code, data)
+
+                    if (field.type.isNullable)
+                        code.add(" else null")
 
                     if (i < paramCount - 1)
                         code.add(",")
@@ -141,9 +143,10 @@ class StandardBuilder(
                 funBuilder.beginControlFlow("if (objData.contains(\"${field.name}\"))")
 
             val code = CodeBlock.builder()
+            if (instantiate)
+                code.add("obj.${field.name} = ")
 
-            code.add("obj.${field.name} = ")
-            field.type.fill(code, "objData[\"${field.name}\"]!!")
+            field.type.fill(code, "objData[\"${field.name}\"]!!", if (instantiate) null else "obj.${field.name}${field.type.nullAssert}")
             code.add("\n")
             funBuilder.addCode(code.build())
 
@@ -339,7 +342,7 @@ class StandardBuilder(
                 packOwnFunc.beginControlFlow("if ($getValue != null)")
 
             if (field in classInfo.referenceOnlyFields)
-                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, %T.typeName(), obj)", "${field.type.fullName}_Packer()")
+                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, %T.typeName(), obj)", "${field.type.name}_Packer()")
             else {
                 val codeBuilder = CodeBlock.builder().add("packMap[\"$name\"] = ")
                 field.type.pack(codeBuilder, getValue)

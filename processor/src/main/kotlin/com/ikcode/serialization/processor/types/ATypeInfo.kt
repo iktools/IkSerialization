@@ -6,14 +6,15 @@ import com.squareup.kotlinpoet.ksp.toClassName
 
 abstract class ATypeInfo(ksType: KSType) {
     val name = ksType.declaration.simpleName.asString()
-    val fullName = ksType.declaration.qualifiedName?.asString() ?: throw Exception("Local declaration is not supported")
     val isNullable = ksType.isMarkedNullable
     val kpType = ksType.makeNotNullable().toClassName()
 
     abstract val fillable: Boolean
-    abstract fun instantiate(data: String): String
+    abstract fun instantiate(code: CodeBlock.Builder, data: String)
     abstract fun pack(code: CodeBlock.Builder, data: String)
-    abstract fun fill(code: CodeBlock.Builder, data: String)
+    abstract fun fill(code: CodeBlock.Builder, data: String, instance: String?)
+
+    val nullAssert get() = if (this.isNullable) "!!" else ""
 
     //val arguments = ksType.arguments.map { types[it.type!!.resolve()] }
 

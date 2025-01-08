@@ -13,6 +13,7 @@ class SimpleDataTests {
     //TODO Double
     //TODO Long
     //TODO Short
+    //TODO Boolean
 
     @Test
     fun enumTests() {
@@ -113,8 +114,7 @@ class SimpleDataTests {
         assertEquals(null, unpacked.nullableNull)
     }
 
-    //TODO
-    /*@Test
+    @Test
     fun referenceTests() {
         val referencedData1 = ObjectSample()
         val referencedData2 = ObjectSample()
@@ -175,7 +175,6 @@ class SimpleDataTests {
         assertEquals(null, unpacked.nullableNullC2)
         assertEquals(null, unpacked.nullableNull2)
     }
-*/
 
     @Test
     fun stringTests() {
