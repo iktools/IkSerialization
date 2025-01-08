@@ -40,6 +40,8 @@ class StandardBuilder(
     }
 
     override fun instantiate(funBuilder: FunSpec.Builder) {
+        val multilineConstructor = 1
+
         funBuilder.addStatement("val name = (packedData as %T).name", ReferencePointer::class)
             .addStatement("val objData = session.dereference(name) as Map<*, *>")
             .addStatement("val existingObj = session.getInstance(name)")
@@ -62,13 +64,31 @@ class StandardBuilder(
             else -> {
                 val code = CodeBlock.builder()
                 code.add("val obj = ${classInfo.name}(")
+
+                val paramCount = classInfo.constructorParams.size
+                if (paramCount > multilineConstructor)
+                    code.indent()
+
                 classInfo.constructorParams.forEachIndexed { i, paramName ->
                     val field = classInfo.allProperties.firstOrNull {
                         paramName.name == it.ksName
                     }!!
-                    val comma = if (i < classInfo.constructorParams.size - 1) ", " else ""
+                    val instantiation = field.type.instantiate("objData[\"${field.name}\"]!!")
 
-                    code.add("${field.type.instantiate("objData[\"${field.name}\"]!!")}$comma")
+                    code.add(
+                        if (field.type.isNullable)
+                            "if (objData.containsKey(\"${field.name}\")) $instantiation else null"
+                        else
+                            instantiation
+                    )
+
+                    if (i < paramCount - 1)
+                        code.add(",")
+
+                    if (paramCount > multilineConstructor)
+                        code.add("\n")
+                    else
+                        code.add(" ")
                 }
                 /*code.append(classInfo.constructorParams
                     .joinToString(", ") { paramName ->
@@ -85,6 +105,8 @@ class StandardBuilder(
                         else
                             instantiation
                     })*/
+                if (paramCount > multilineConstructor)
+                    code.unindent()
                 code.add(")\n")
                 funBuilder.addCode(code.build())
             }
@@ -108,10 +130,51 @@ class StandardBuilder(
                 .addStatement("obj as $this.classInfo.kpType")
         }
 
-        classInfo.allProperties.filter { field ->
+        for (field in classInfo.ownProperties) {
+            val instantiate = field.isMutable && !field.inConstructor
+            val fill = field.type.fillable
+
+            if (!instantiate && !fill)
+                continue
+
+            if (field.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.contains(\"${field.name}\"))")
+
+            val code = CodeBlock.builder()
+
+            code.add("obj.${field.name} = ")
+            field.type.fill(code, "objData[\"${field.name}\"]!!")
+            code.add("\n")
+            funBuilder.addCode(code.build())
+
+            if (field.type.isNullable) {
+                funBuilder.endControlFlow()
+                if (!field.inConstructor)
+                    funBuilder.addStatement("else obj.${field.name} = null")
+            }
+
+        }
+        /*classInfo.allProperties.filter { field ->
             field.isMutable || field.inConstructor
         }.forEach { field ->
-            /*val instantiate = field.isMutable && !field.inConstructor
+            if (field.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.contains(\"${field.name}\"))")
+
+            val instantiate = field.isMutable && !field.inConstructor
+            val code = CodeBlock.builder()
+
+            code.add("obj.${field.name} = ")
+            field.type.fill(code, "objData[\"${field.name}\"]!!")
+            code.add("\n")
+            funBuilder.addCode(code.build())
+
+            if (field.type.isNullable) {
+                funBuilder.endControlFlow()
+                if (!field.inConstructor)
+                    funBuilder.addStatement("else obj.${field.name} = null")
+            }
+
+            /*
             val fill = !field.type.isPrimitive
 
             funBuilder.addComment("TODO $instantiate $fill ${field.type.isNullable}")
@@ -239,13 +302,7 @@ class StandardBuilder(
                     funBuilder.addStatement("${field.type.name}_Packer().fillData($getValue, session)")
                 }
             }*/
-
-            /*if (field.type.isNullable) {
-                funBuilder.endControlFlow()
-                if (!field.inConstructor)
-                    funBuilder.addStatement("else obj.${field.name} = null")
-            }*/
-        }
+        }*/
         /*if (subclasses.any()) {
             fillFunc.beginControlFlow("when(obj)")
             for (subclass in subclasses)
@@ -281,10 +338,14 @@ class StandardBuilder(
             if (field.type.isNullable)
                 packOwnFunc.beginControlFlow("if ($getValue != null)")
 
-            /*if (field in classInfo.referenceOnlyFields)
-                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, ${field.type.fullName}_Packer().typeName(), obj)")
-            else
-                packOwnFunc.addStatement("packMap[\"$name\"] = ${this.packType(field.type, getValue)}")*/
+            if (field in classInfo.referenceOnlyFields)
+                packOwnFunc.addStatement("packMap[\"$name\"] = session.registerProduced($getValue, %T.typeName(), obj)", "${field.type.fullName}_Packer()")
+            else {
+                val codeBuilder = CodeBlock.builder().add("packMap[\"$name\"] = ")
+                field.type.pack(codeBuilder, getValue)
+                codeBuilder.add("\n")
+                packOwnFunc.addCode(codeBuilder.build())
+            }
 
             if (field.type.isNullable)
                 packOwnFunc.endControlFlow()

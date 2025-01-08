@@ -1,13 +1,19 @@
 package com.ikcode.serialization.processor.types
 
 import com.google.devtools.ksp.symbol.KSType
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.ksp.toClassName
 
 abstract class ATypeInfo(ksType: KSType) {
     val name = ksType.declaration.simpleName.asString()
-    //val fullName = ksType.declaration.qualifiedName?.asString() ?: throw Exception("Local declaration is not supported")
+    val fullName = ksType.declaration.qualifiedName?.asString() ?: throw Exception("Local declaration is not supported")
     val isNullable = ksType.isMarkedNullable
+    val kpType = ksType.makeNotNullable().toClassName()
 
+    abstract val fillable: Boolean
     abstract fun instantiate(data: String): String
+    abstract fun pack(code: CodeBlock.Builder, data: String)
+    abstract fun fill(code: CodeBlock.Builder, data: String)
 
     //val arguments = ksType.arguments.map { types[it.type!!.resolve()] }
 

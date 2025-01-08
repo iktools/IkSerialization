@@ -15,7 +15,7 @@ class EnumBuilder(
     }
 
     override fun instantiate(funBuilder: FunSpec.Builder) {
-        funBuilder.addStatement("return ${classInfo.name}.values()[packedData as Int]")
+        funBuilder.addStatement("return %T.values()[packedData as Int]", classInfo.kpType)
     }
 
     override fun fill(funBuilder: FunSpec.Builder) {
