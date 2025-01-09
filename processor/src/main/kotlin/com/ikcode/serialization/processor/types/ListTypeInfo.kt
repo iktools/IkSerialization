@@ -7,6 +7,7 @@ class ListTypeInfo(
     ksType: KSType,
     private val concrete: Boolean,
     private val mutable: Boolean,
+    private val isSet: Boolean,
     types: TypeUtil
 ): ATypeInfo(ksType) {
     override val fillable get() = true
@@ -23,12 +24,7 @@ class ListTypeInfo(
         code.add("\n")
         code.endControlFlow()
 
-        if (this.concrete)
-            code.add(")")
-        else if (this.mutable)
-            code.addStatement(".toMutableList()")
-        else
-            code.addStatement(".toList()")
+        this.collector(code)
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
@@ -36,10 +32,7 @@ class ListTypeInfo(
         this.argument.pack(code, "it")
         code.endControlFlow()
 
-        if (this.mutable)
-            code.addStatement(".toMutableList()")
-        else
-            code.addStatement(".toList()")
+        code.add(".toList()\n")
     }
 
     override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {
@@ -51,18 +44,23 @@ class ListTypeInfo(
             this.argument.instantiate(code, "itemData!!")
             code.endControlFlow()
 
-            if (this.concrete)
-                code.addStatement(")")
-            else if (this.mutable)
-                code.addStatement(".toMutableList()")
-            else
-                code.addStatement(".toList()")
+            this.collector(code)
         }
 
         if (this.argument.fillable) {
             code.beginControlFlow("$destination.forEach { item ->")
             this.argument.fill(code, "", "item", false)
             code.endControlFlow()
+        }
+    }
+
+    private fun collector(code: CodeBlock.Builder) {
+        when {
+            this.concrete -> code.add(")\n")
+            !this.isSet && this.mutable -> code.add(".toMutableList()\n")
+            !this.isSet && !this.mutable -> code.add(".toList()\n")
+            this.isSet && this.mutable -> code.add(".toMutableSet()\n")
+            else -> code.add(".toSet()\n")
         }
     }
 }

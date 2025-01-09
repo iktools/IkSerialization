@@ -33,6 +33,12 @@ class TypeUtil(
     private val mutableIterableType = resolver
         .getClassDeclarationByName<MutableIterable<*>>()!!
         .asStarProjectedType()
+    private val setType = resolver
+        .getClassDeclarationByName<Set<*>>()!!
+        .asStarProjectedType()
+    private val mutableSetType = resolver
+        .getClassDeclarationByName<MutableSet<*>>()!!
+        .asStarProjectedType()
     val mapType = resolver
         .getClassDeclarationByName<Map<*, *>>()!!
         .asStarProjectedType()
@@ -55,9 +61,9 @@ class TypeUtil(
                 type,
                 concrete,
                 this.mutableIterableType.isAssignableFrom(justType),
+                this.setType.isAssignableFrom(justType),
                 this
             )
-
             else -> ClassInfo(type)
         }
     }
