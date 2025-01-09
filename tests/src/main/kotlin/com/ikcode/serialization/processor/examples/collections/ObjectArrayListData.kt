@@ -4,7 +4,7 @@ import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 import com.ikcode.serialization.processor.examples.simple.ObjectSample
 
-/*@SerializableClass
+@SerializableClass
 class ObjectArrayListData(
     @SerializationData val readonlyC: ArrayList<ObjectSample>,
     @SerializationData var mutableC: ArrayList<ObjectSample>,
@@ -14,4 +14,4 @@ class ObjectArrayListData(
     @SerializationData var mutable = arrayListOf<ObjectSample>()
     @SerializationData var nullableNull: ArrayList<ObjectSample>? = arrayListOf()
     @SerializationData var nullableValue: ArrayList<ObjectSample>? = arrayListOf()
-}*/
+}

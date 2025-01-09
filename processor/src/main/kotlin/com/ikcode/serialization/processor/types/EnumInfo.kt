@@ -14,8 +14,8 @@ class EnumInfo(ksType: KSType): ATypeInfo(ksType) {
         code.add("$data.ordinal")
     }
 
-    override fun fill(code: CodeBlock.Builder, data: String, instance: String?) {
-        if (instance != null)
+    override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {
+        if (!instantiate)
             throw IllegalArgumentException("Number can't be filled")
 
         code.add("%T.values()[$data as Int]", this.kpType)

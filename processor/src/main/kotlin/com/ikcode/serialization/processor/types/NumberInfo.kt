@@ -14,8 +14,8 @@ class NumberInfo(ksType: KSType): ATypeInfo(ksType) {
         code.add(data)
     }
 
-    override fun fill(code: CodeBlock.Builder, data: String, instance: String?) {
-        if (instance != null)
+    override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {
+        if (!instantiate)
             throw IllegalArgumentException("Number can't be filled")
 
         code.add("($data as Number).to${this.name}()")

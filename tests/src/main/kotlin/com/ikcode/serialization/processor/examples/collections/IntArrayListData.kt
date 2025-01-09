@@ -3,7 +3,7 @@ package com.ikcode.serialization.processor.examples.collections
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 
-/*@SerializableClass
+@SerializableClass
 class IntArrayListData(
     @SerializationData val readonlyC: ArrayList<Int>,
     @SerializationData var mutableC: ArrayList<Int>,
@@ -13,4 +13,4 @@ class IntArrayListData(
     @SerializationData var mutable = arrayListOf<Int>()
     @SerializationData var nullableNull: ArrayList<Int>? = arrayListOf()
     @SerializationData var nullableValue: ArrayList<Int>? = arrayListOf()
-}*/
+}

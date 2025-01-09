@@ -286,8 +286,8 @@ class SimpleDataTests {
 
     @Test
     fun referenceTests() {
-        val referencedData1 = ObjectSample()
-        val referencedData2 = ObjectSample()
+        val referencedData1 = ObjectSample(1)
+        val referencedData2 = ObjectSample(2)
         val data = ObjectData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2

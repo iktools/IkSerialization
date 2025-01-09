@@ -2,6 +2,7 @@ package com.ikcode.serialization.processor.types
 
 import com.google.devtools.ksp.findActualType
 import com.google.devtools.ksp.getClassDeclarationByName
+import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -41,11 +42,13 @@ class TypeUtil(
             is KSTypeAlias -> declaration.findActualType()
             else -> null
         }
+        val concrete = classDeclaration?.getConstructors()?.any() == true
 
         return when {
             justType in this.numbers -> NumberInfo(type)
             justType in this.primitives -> PrimitiveInfo(type)
             classDeclaration?.classKind == ClassKind.ENUM_CLASS -> EnumInfo(type)
+            this.collectionType.isAssignableFrom(justType) -> ListTypeInfo(type, concrete, this)
             else -> ClassInfo(type)
         }
     }

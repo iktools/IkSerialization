@@ -3,13 +3,17 @@ package com.ikcode.serialization.processor
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
+import com.ikcode.serialization.processor.examples.collections.IntArrayListData
+import com.ikcode.serialization.processor.examples.collections.IntArrayListData_Packer
+import com.ikcode.serialization.processor.examples.collections.ObjectArrayListData
+import com.ikcode.serialization.processor.examples.collections.ObjectArrayListData_Packer
 import com.ikcode.serialization.processor.examples.simple.ObjectSample
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SimpleArrayListTests {
 
-    /*@Test
+    @Test
     fun intArrayListTests() {
         val data = IntArrayListData(
             arrayListOf(1),
@@ -50,11 +54,11 @@ class SimpleArrayListTests {
 
     @Test
     fun objectArrayListTests() {
-        val referencedData1 = ObjectSample()
-        val referencedData2 = ObjectSample()
-        val referencedData3 = ObjectSample()
-        val referencedData4 = ObjectSample()
-        val referencedData5 = ObjectSample()
+        val referencedData1 = ObjectSample(1)
+        val referencedData2 = ObjectSample(2)
+        val referencedData3 = ObjectSample(3)
+        val referencedData4 = ObjectSample(4)
+        val referencedData5 = ObjectSample(5)
 
         val data = ObjectArrayListData(
             arrayListOf(referencedData1),
@@ -95,12 +99,12 @@ class SimpleArrayListTests {
             UnpackingSession(session.referencedData)
         )
 
-        assertEquals(arrayListOf(ObjectSample()), unpacked.readonlyC)
-        assertEquals(arrayListOf(ObjectSample()), unpacked.mutableC)
-        assertEquals(arrayListOf(ObjectSample()), unpacked.nullableValueC)
-        assertEquals(arrayListOf(ObjectSample()), unpacked.mutable)
-        assertEquals(arrayListOf(ObjectSample()), unpacked.nullableValue)
+        assertEquals(arrayListOf(ObjectSample(1)), unpacked.readonlyC)
+        assertEquals(arrayListOf(ObjectSample(2)), unpacked.mutableC)
+        assertEquals(arrayListOf(ObjectSample(3)), unpacked.nullableValueC)
+        assertEquals(arrayListOf(ObjectSample(4)), unpacked.mutable)
+        assertEquals(arrayListOf(ObjectSample(5)), unpacked.nullableValue)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
-    }*/
+    }
 }

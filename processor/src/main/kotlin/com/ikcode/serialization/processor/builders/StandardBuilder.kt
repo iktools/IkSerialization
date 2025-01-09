@@ -146,7 +146,12 @@ class StandardBuilder(
             if (instantiate)
                 code.add("obj.${field.name} = ")
 
-            field.type.fill(code, "objData[\"${field.name}\"]!!", if (instantiate) null else "obj.${field.name}${field.type.nullAssert}")
+            field.type.fill(
+                code,
+                "objData[\"${field.name}\"]!!",
+                "obj.${field.name}${field.type.nullAssert}",
+                instantiate
+            )
             code.add("\n")
             funBuilder.addCode(code.build())
 
