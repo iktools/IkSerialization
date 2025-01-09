@@ -4,6 +4,7 @@ plugins {
     id("buildsrc.convention.kotlin-jvm")
 
     id("com.google.devtools.ksp") version "2.0.21-1.0.28"
+    kotlin("jvm")
 }
 
 dependencies {
@@ -11,4 +12,11 @@ dependencies {
     implementation("com.google.devtools.ksp:symbol-processing-api:2.0.21-1.0.28")
     implementation("com.squareup:kotlinpoet:2.0.0")
     implementation("com.squareup:kotlinpoet-ksp:2.0.0")
+    implementation(kotlin("stdlib-jdk8"))
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(8)
 }

@@ -8,12 +8,116 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SimpleDataTests {
-    //TODO Byte
-    //TODO Char
-    //TODO Double
-    //TODO Long
-    //TODO Short
-    //TODO Boolean
+    @Test
+    fun booleanTests() {
+        val data = BooleanData(true, false, true, false, null, true, false).apply {
+            mutable1 = true
+            mutable2 = false
+            nullableNull = null
+            nullableValue1 = true
+            nullableValue2 = false
+        }
+        val session = PackingSession()
+        val pointer = BooleanData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(true, packed["readonlyC1"])
+        assertEquals(false, packed["readonlyC2"])
+        assertEquals(true, packed["mutableC1"])
+        assertEquals(false, packed["mutableC2"])
+        assertEquals(true, packed["nullableValueC1"])
+        assertEquals(false, packed["nullableValueC2"])
+        assertEquals(true, packed["mutable1"])
+        assertEquals(false, packed["mutable2"])
+        assertEquals(true, packed["nullableValue1"])
+        assertEquals(false, packed["nullableValue2"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = BooleanData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(true, unpacked.readonlyC1)
+        assertEquals(false, unpacked.readonlyC2)
+        assertEquals(true, unpacked.mutableC1)
+        assertEquals(false, unpacked.mutableC2)
+        assertEquals(true, unpacked.nullableValueC1)
+        assertEquals(false, unpacked.nullableValueC2)
+        assertEquals(true, unpacked.mutable1)
+        assertEquals(false, unpacked.mutable2)
+        assertEquals(true, unpacked.nullableValue1)
+        assertEquals(false, unpacked.nullableValue2)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
+    fun byteTests() {
+        val data = ByteData(1, 2, null, 3).apply {
+            mutable = 4
+            nullableNull = null
+            nullableValue = 5
+        }
+        val session = PackingSession()
+        val pointer = ByteData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(1.toByte(), packed["readonlyC"])
+        assertEquals(2.toByte(), packed["mutableC"])
+        assertEquals(3.toByte(), packed["nullableValueC"])
+        assertEquals(4.toByte(), packed["mutable"])
+        assertEquals(5.toByte(), packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = ByteData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(1, unpacked.readonlyC)
+        assertEquals(2, unpacked.mutableC)
+        assertEquals(3, unpacked.nullableValueC)
+        assertEquals(4, unpacked.mutable)
+        assertEquals(5, unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
+    fun charTests() {
+        val data = CharData('A', 'B', null, 'C').apply {
+            mutable = 'D'
+            nullableNull = null
+            nullableValue = 'E'
+        }
+        val session = PackingSession()
+        val pointer = CharData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals('A', packed["readonlyC"])
+        assertEquals('B', packed["mutableC"])
+        assertEquals('C', packed["nullableValueC"])
+        assertEquals('D', packed["mutable"])
+        assertEquals('E', packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = CharData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals('A', unpacked.readonlyC)
+        assertEquals('B', unpacked.mutableC)
+        assertEquals('C', unpacked.nullableValueC)
+        assertEquals('D', unpacked.mutable)
+        assertEquals('E', unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
 
     @Test
     fun enumTests() {
@@ -82,6 +186,39 @@ class SimpleDataTests {
     }
 
     @Test
+    fun doubleTests() {
+        val data = DoubleData(1.0, 2.0, null, 3.0).apply {
+            mutable = 4.0
+            nullableNull = null
+            nullableValue = 5.0
+        }
+        val session = PackingSession()
+        val pointer = DoubleData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(1.0, packed["readonlyC"])
+        assertEquals(2.0, packed["mutableC"])
+        assertEquals(3.0, packed["nullableValueC"])
+        assertEquals(4.0, packed["mutable"])
+        assertEquals(5.0, packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = DoubleData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(1.0, unpacked.readonlyC)
+        assertEquals(2.0, unpacked.mutableC)
+        assertEquals(3.0, unpacked.nullableValueC)
+        assertEquals(4.0, unpacked.mutable)
+        assertEquals(5.0, unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
     fun intTests() {
         val data = IntData(1, 2, null, 3).apply {
             mutable = 4
@@ -101,6 +238,39 @@ class SimpleDataTests {
         assert(!packed.containsKey("nullableNull"))
 
         val unpacked = IntData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(1, unpacked.readonlyC)
+        assertEquals(2, unpacked.mutableC)
+        assertEquals(3, unpacked.nullableValueC)
+        assertEquals(4, unpacked.mutable)
+        assertEquals(5, unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
+    fun longTests() {
+        val data = LongData(1, 2, null, 3).apply {
+            mutable = 4
+            nullableNull = null
+            nullableValue = 5
+        }
+        val session = PackingSession()
+        val pointer = LongData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(1L, packed["readonlyC"])
+        assertEquals(2L, packed["mutableC"])
+        assertEquals(3L, packed["nullableValueC"])
+        assertEquals(4L, packed["mutable"])
+        assertEquals(5L, packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = LongData_Packer().unpack(
             pointer,
             UnpackingSession(session.referencedData)
         )
@@ -174,6 +344,39 @@ class SimpleDataTests {
         assertEquals(obj2, unpacked.nullableValue2)
         assertEquals(null, unpacked.nullableNullC2)
         assertEquals(null, unpacked.nullableNull2)
+    }
+
+    @Test
+    fun shortTests() {
+        val data = ShortData(1, 2, null, 3).apply {
+            mutable = 4
+            nullableNull = null
+            nullableValue = 5
+        }
+        val session = PackingSession()
+        val pointer = ShortData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(1.toShort(), packed["readonlyC"])
+        assertEquals(2.toShort(), packed["mutableC"])
+        assertEquals(3.toShort(), packed["nullableValueC"])
+        assertEquals(4.toShort(), packed["mutable"])
+        assertEquals(5.toShort(), packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = ShortData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(1, unpacked.readonlyC)
+        assertEquals(2, unpacked.mutableC)
+        assertEquals(3, unpacked.nullableValueC)
+        assertEquals(4, unpacked.mutable)
+        assertEquals(5, unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
     }
 
     @Test
