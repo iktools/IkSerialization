@@ -17,7 +17,7 @@ class TypeUtil(
         .getClassDeclarationByName<IProxyPacked<*>>()!!
         .asStarProjectedType()
 
-    val numbers = setOf(
+    private val numbers = setOf(
         resolver.builtIns.intType,
         resolver.builtIns.byteType,
         resolver.builtIns.shortType,
@@ -26,9 +26,12 @@ class TypeUtil(
         resolver.builtIns.floatType,
         resolver.builtIns.doubleType
     )
-    val primitives = numbers + resolver.builtIns.booleanType + resolver.builtIns.stringType + resolver.builtIns.charType
-    val collectionType = resolver
-        .getClassDeclarationByName<Collection<*>>()!!
+    private val primitives = numbers + resolver.builtIns.booleanType + resolver.builtIns.stringType + resolver.builtIns.charType
+    private val iterableType = resolver
+        .getClassDeclarationByName<Iterable<*>>()!!
+        .asStarProjectedType()
+    private val mutableIterableType = resolver
+        .getClassDeclarationByName<MutableIterable<*>>()!!
         .asStarProjectedType()
     val mapType = resolver
         .getClassDeclarationByName<Map<*, *>>()!!
@@ -48,7 +51,13 @@ class TypeUtil(
             justType in this.numbers -> NumberInfo(type)
             justType in this.primitives -> PrimitiveInfo(type)
             classDeclaration?.classKind == ClassKind.ENUM_CLASS -> EnumInfo(type)
-            this.collectionType.isAssignableFrom(justType) -> ListTypeInfo(type, concrete, this)
+            this.iterableType.isAssignableFrom(justType) -> ListTypeInfo(
+                type,
+                concrete,
+                this.mutableIterableType.isAssignableFrom(justType),
+                this
+            )
+
             else -> ClassInfo(type)
         }
     }
