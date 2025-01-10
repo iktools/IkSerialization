@@ -36,17 +36,16 @@ class TypeUtil(
     private val setType = resolver
         .getClassDeclarationByName<Set<*>>()!!
         .asStarProjectedType()
-    private val mutableSetType = resolver
-        .getClassDeclarationByName<MutableSet<*>>()!!
-        .asStarProjectedType()
-    val mapType = resolver
+    private val mapType = resolver
         .getClassDeclarationByName<Map<*, *>>()!!
+        .asStarProjectedType()
+    private val mutableMapType = resolver
+        .getClassDeclarationByName<MutableMap<*, *>>()!!
         .asStarProjectedType()
 
     operator fun get(type: KSType): ATypeInfo {
         val justType = type.starProjection().makeNotNullable()
-        val declaration = type.declaration
-        val classDeclaration = when(declaration) {
+        val classDeclaration = when(val declaration = type.declaration) {
             is KSClassDeclaration -> declaration
             is KSTypeAlias -> declaration.findActualType()
             else -> null
@@ -57,6 +56,12 @@ class TypeUtil(
             justType in this.numbers -> NumberInfo(type)
             justType in this.primitives -> PrimitiveInfo(type)
             classDeclaration?.classKind == ClassKind.ENUM_CLASS -> EnumInfo(type)
+            this.mapType.isAssignableFrom(justType) -> MapTypeInfo(
+                type,
+                concrete,
+                this.mutableMapType.isAssignableFrom(justType),
+                this
+            )
             this.iterableType.isAssignableFrom(justType) -> ListTypeInfo(
                 type,
                 concrete,

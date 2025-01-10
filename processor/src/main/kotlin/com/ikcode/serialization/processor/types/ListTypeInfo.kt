@@ -11,7 +11,7 @@ class ListTypeInfo(
     types: TypeUtil
 ): ATypeInfo(ksType) {
     override val fillable get() = true
-    val argument = types[ksType.arguments[0].type!!.resolve()]
+    private val argument = types[ksType.arguments[0].type!!.resolve()]
 
     override fun instantiate(code: CodeBlock.Builder, data: String) {
         code.add("//${this.concrete}\n")
