@@ -82,5 +82,3 @@ fun serializationMapper(obj: Any, path: String = ""): Any = when(obj) {
     else -> obj
 }
 ```
-
-Two stages are not just to the library unopinionated about the concrete  
