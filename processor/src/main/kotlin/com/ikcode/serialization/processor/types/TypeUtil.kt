@@ -27,6 +27,7 @@ class TypeUtil(
         resolver.builtIns.doubleType
     )
     private val primitives = numbers + resolver.builtIns.booleanType + resolver.builtIns.stringType + resolver.builtIns.charType
+
     private val iterableType = resolver
         .getClassDeclarationByName<Iterable<*>>()!!
         .asStarProjectedType()
@@ -41,6 +42,10 @@ class TypeUtil(
         .asStarProjectedType()
     private val mutableMapType = resolver
         .getClassDeclarationByName<MutableMap<*, *>>()!!
+        .asStarProjectedType()
+
+    private val pairType = resolver
+        .getClassDeclarationByName<Pair<*, *>>()!!
         .asStarProjectedType()
 
     operator fun get(type: KSType): ATypeInfo {
@@ -69,6 +74,7 @@ class TypeUtil(
                 this.setType.isAssignableFrom(justType),
                 this
             )
+            this.pairType == justType -> ClassAsListInfo(type, classDeclaration!!, this)
             else -> ClassInfo(type)
         }
     }

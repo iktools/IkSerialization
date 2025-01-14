@@ -26,14 +26,14 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil) {
     val ownProperties = declaration.getDeclaredProperties().filter {
         it.isAnnotationPresent(SerializationData::class)
     }.map {
-        PropertyInfo(it, types, this.constructorParams.any { param -> param.name == it.simpleName })
+        PropertyInfo(it, declaration.asStarProjectedType(), types, this.constructorParams.any { param -> param.name == it.simpleName })
     }.toList()
 
     @OptIn(KspExperimental::class)
     val allProperties = declaration.getAllProperties().filter {
         it.isAnnotationPresent(SerializationData::class)
     }.map {
-        PropertyInfo(it, types, this.constructorParams.any { param -> param.name == it.simpleName })
+        PropertyInfo(it, declaration.asStarProjectedType(), types, this.constructorParams.any { param -> param.name == it.simpleName })
     }.toList()
 
     //TODO

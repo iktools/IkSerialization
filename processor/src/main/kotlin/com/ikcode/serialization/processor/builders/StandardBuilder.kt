@@ -74,7 +74,6 @@ class StandardBuilder(
                         paramName.name == it.ksName
                     }!!
                     val data = "objData[\"${field.name}\"]!!"
-                    //val instantiation = field.type.instantiate(data)
 
                     if (field.type.isNullable)
                         code.add("if (objData.containsKey(\"${field.name}\")) ")
