@@ -24,6 +24,7 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
 
         val paramCount = this.constructorParams.size
         this.constructorParams.forEachIndexed { i, paramName ->
+            //TODO find index in allProperties instead
             val field = this.allProperties.first {
                 paramName.name == it.ksName
             }
@@ -51,13 +52,22 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
-        code.add(data)
+        val propCount = this.allProperties.size
+        code.add("listOf(")
+
+        this.allProperties.forEachIndexed { i, field ->
+            code.add("$data.${field.name}")
+            if (i < propCount - 1)
+                code.add(", ")
+        }
+
+        code.add(")")
     }
 
     override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {
-        if (!instantiate)
-            throw IllegalArgumentException("Number can't be filled")
+        if (instantiate)
+            this.instantiate(code, data)
 
-        code.add("($data as Number).to${this.name}()")
+        code.add("//TODO ($data as Number).to${this.name}()")
     }
 }
