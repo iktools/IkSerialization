@@ -3,7 +3,6 @@ package com.ikcode.serialization.processor.builders
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
 import com.ikcode.serialization.processor.PackerInfo
-import com.ikcode.serialization.processor.types.ATypeInfo
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
@@ -51,102 +50,5 @@ abstract class ABuilder(
         return FileSpec.builder(this.classInfo.namespace, this.classInfo.outFileName)
             .addType(type.build())
             .build()
-    }
-
-    //TODO
-    /*protected fun packType(type: ATypeInfo, getValue: String): String = when {
-        type.isPrimitive -> getValue
-        type.isCollection -> "$getValue.map { ${packType(type.arguments[0], "it")} }.toList()"
-        type.rawType == "java.util.ArrayList" || type.rawType == "java.util.List" || type.rawType == "java.util.Collection" || type.rawType == "java.lang.Iterable" || type.rawType == "kotlin.collections.List" || type.rawType == "java.util.HashSet" || type.rawType == "java.util.Set" ->
-            "$getValue.map { ${packType(type.genericParams[0], "it")} }.toList()"
-        type.rawType == "java.util.HashMap" || type.rawType == "java.util.Map" ->
-            "$getValue.map { ${packType(type.genericParams[0], "it.key")}·to ${packType(type.genericParams[1], "it.value")} }.toMap()"
-        type.rawType == "kotlin.Pair" ->
-            "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[1], "$getValue.second")})"
-        type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" ->
-            "listOf<Any>(${packType(type.genericParams[0], "$getValue.first")}, ${packType(type.genericParams[0], "$getValue.second")})"
-        else -> "${type.fullName}_Packer().pack($getValue, session)"
-    }*/
-
-    //TODO
-    /*protected fun instantiateParamFunc(type: ATypeInfo, data: String): String = when {
-        type.isNumber -> "($data as Number).to${type.name}()"
-        type.isPrimitive -> "$data as ${type.fullName}"
-        type.isMap ->
-            "($data as Map<*, *>).map { ${
-                instantiateParamFunc(
-                    type.arguments[0],
-                    "it.key!!"
-                )
-            }·to ${instantiateParamFunc(type.arguments[1], "it.value!!")}}.toMap().toMutableMap()"
-        type.isCollection -> "${type.name}(($data as Collection<${type.arguments[0].fullName}>).map { ${instantiateParamFunc(type.arguments[0], "it!!")} })"
-        type.rawType == "java.util.ArrayList" -> "ArrayList(($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} })"
-        type.rawType == "java.lang.Iterable" || type.rawType == "java.util.Collection" || type.rawType == "kotlin.collections.List" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toList()"
-        type.rawType == "java.util.HashSet" -> "($data as List<*>).map { ${instantiateParamFunc(type.genericParams[0], "it!!")} }.toHashSet()"
-        type.rawType == "java.util.HashMap" -> "HashMap(($data as Map<*, *>).map { ${instantiateParamFunc(type.genericParams[0], "it.key!!")}·to ${instantiateParamFunc(type.genericParams[1], "it.value!!")}}.toMap())"
-        type.rawType == "java.util.Map" -> "($data as Map<*, *>).map { ${instantiateParamFunc(type.genericParams[0], "it.key!!")}·to ${instantiateParamFunc(type.genericParams[1], "it.value!!")}}.toMap().toMutableMap()"
-        type.rawType == "kotlin.Pair" -> "($data as List<*>).let { Pair(${instantiateParamFunc(type.genericParams[0], "it[0]!!")}, ${instantiateParamFunc(type.genericParams[1], "it[1]!!")}) }"
-        type.rawType == "com.ikcode.ancientstar1.core.util.UnorderedPair" -> "($data as List<*>).let { com.ikcode.ancientstar1.core.util.UnorderedPair(${instantiateParamFunc(type.genericParams[0], "it[0]!!")}, ${instantiateParamFunc(type.genericParams[0], "it[1]!!")}) }"
-        else -> {
-            "${type.fullName}_Packer().instantiate($data, session)"
-        }
-    }*/
-
-    protected fun fillParamType(fillFunc: FunSpec.Builder, type: ATypeInfo, destination: String, data: String, assign: Boolean, instantiate: Boolean, fill: Boolean) {
-        val nullAssert = if (type.isNullable) "!!" else ""
-
-        when {
-            assign -> {
-                fillFunc.addStatement("$destination = ")
-                fillParamType(fillFunc, type, destination, data, false, instantiate, fill)
-            }
-            //TODO
-            /*type.isPrimitive -> if (instantiate)
-                fillFunc.addStatement("$data as ${type.name}")
-            type.isCollection -> if (instantiate) {
-                if (type.concrete)
-                    fillFunc.addStatement("${type.fullName}(")
-
-                fillFunc.beginControlFlow("($data as List<*>).map { itemData ->")
-                fillParamType(fillFunc, type.arguments[0], "", "itemData!!", false, true, true)
-                fillFunc.endControlFlow()
-
-                if (type.concrete)
-                    fillFunc.addStatement(")")
-                else
-                    fillFunc.addStatement(".toList()") //TODO add for mutable list
-
-                fillFunc.beginControlFlow("$destination.forEach { item ->")
-                fillParamType(fillFunc, type.arguments[0], "item")
-                fillFunc.endControlFlow()
-            }
-            /*"java.util.ArrayList", "java.util.Collection", "java.util.HashSet", "java.util.List" -> {
-                fillFunc.beginControlFlow("$destination.forEach { item ->")
-                fillParamType(fillFunc, type.genericParams[0], "item")
-                fillFunc.endControlFlow()
-            }
-            "java.util.Map" -> {
-                fillFunc.beginControlFlow("$destination.entries.forEach { (key, value) ->")
-                if (type.genericParams[0].fillable)
-                    fillParamType(fillFunc, type.genericParams[0], "key")
-                if (type.genericParams[1].fillable)
-                    fillParamType(fillFunc, type.genericParams[1], "value")
-                fillFunc.endControlFlow()
-            }
-            "kotlin.Pair" -> {
-                if (type.genericParams[0].fillable)
-                    fillParamType(fillFunc, type.genericParams[0], "$destination.first")
-                if (type.genericParams[1].fillable)
-                    fillParamType(fillFunc, type.genericParams[1], "$destination.second")
-            }
-            "com.ikcode.ancientstar1.core.util.UnorderedPair" -> {
-                if (type.genericParams[0].fillable)
-                    fillParamType(fillFunc, type.genericParams[0], "$destination.first")
-                if (type.genericParams[0].fillable)
-                    fillParamType(fillFunc, type.genericParams[0], "$destination.second")
-            }*/
-            instantiate && fill -> fillFunc.addStatement("${type.fullName}_Packer().unpack($data, session)")
-            fill && !type.isEnum -> fillFunc.addStatement("${type.fullName}_Packer().fillData($destination$nullAssert, session)")*/
-        }
     }
 }

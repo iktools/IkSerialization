@@ -16,19 +16,6 @@ abstract class ATypeInfo(ksType: KSType) {
 
     val nullAssert get() = if (this.isNullable) "!!" else ""
 
-    //val arguments = ksType.arguments.map { types[it.type!!.resolve()] }
-
-
-    /*private val justType = type.starProjection().makeNotNullable()
-    private val classDeclaration = types.resolve(type.declaration)
-
-    val isNumber = this.justType in types.numbers
-    val isPrimitive = this.justType in types.primitives
-    val isEnum = classDeclaration?.classKind == ClassKind.ENUM_CLASS
-    val concrete = classDeclaration?.getConstructors()?.any() == true
-    val isCollection = types.collectionType.isAssignableFrom(this.justType)
-    val isMap = types.mapType.isAssignableFrom(this.justType)*/
-
     //TODO remove
     val original = ksType
 }
