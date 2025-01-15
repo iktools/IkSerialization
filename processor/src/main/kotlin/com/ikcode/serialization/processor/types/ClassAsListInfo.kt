@@ -1,15 +1,9 @@
 package com.ikcode.serialization.processor.types
 
-import com.google.devtools.ksp.isAnnotationPresent
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.symbol.KSTypeParameter
-import com.ikcode.serialization.core.annotations.SerializationData
 import com.ikcode.serialization.processor.builders.PropertyInfo
-import com.ikcode.serialization.processor.logger
 import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.ksp.toClassName
-import kotlin.math.log
 
 class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: TypeUtil): ATypeInfo(ksType) {
     private val constructorParams = declaration.primaryConstructor?.parameters ?: listOf()
@@ -17,35 +11,24 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
         PropertyInfo(it, ksType, types, this.constructorParams.any { param -> param.name == it.simpleName })
     }.toList()
 
-    override val fillable get() = false
+    override val fillable = this.allProperties.all { it.type.fillable }
 
     override fun instantiate(code: CodeBlock.Builder, data: String) {
         code.add("%T(", this.kpType)
 
-        val paramCount = this.constructorParams.size
-        this.constructorParams.forEachIndexed { i, paramName ->
-            //TODO find index in allProperties instead
-            val field = this.allProperties.first {
+        var commaCount = this.constructorParams.size - 1
+        this.constructorParams.forEach { paramName ->
+            val i = this.allProperties.indexOfFirst {
                 paramName.name == it.ksName
             }
+            val field = this.allProperties[i]
 
-            val data = "objData[$i]!!"
+            field.type.instantiate(code, "($data as List<*>)[$i]!!")
 
-            if (field.type.isNullable)
-                code.add("if (objData.containsKey(\"${field.name}\")) ")
-
-            field.type.instantiate(code, data)
-
-            if (field.type.isNullable)
-                code.add(" else null")
-
-            if (i < paramCount - 1)
-                code.add(",")
-
-            /*if (paramCount > multilineConstructor)
-                code.add("\n")
-            else
-                code.add(" ")*/
+            if (commaCount > 0) {
+                code.add(", ")
+                commaCount--
+            }
         }
 
         code.add(")")
@@ -68,6 +51,12 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
         if (instantiate)
             this.instantiate(code, data)
 
-        code.add("//TODO ($data as Number).to${this.name}()")
+        for (i in this.allProperties.indices) {
+            val property = this.allProperties[i]
+            if (!property.type.fillable)
+                continue
+
+            property.type.fill(code, "$data[$i]", "$destination.${property.name}", false)
+        }
     }
 }
