@@ -39,7 +39,7 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
         code.add("listOf(")
 
         this.allProperties.forEachIndexed { i, field ->
-            code.add("$data.${field.name}")
+            field.type.pack(code, "$data.${field.name}")
             if (i < propCount - 1)
                 code.add(", ")
         }
@@ -56,6 +56,8 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
             if (!property.type.fillable)
                 continue
 
+            if (instantiate)
+                code.add("\n")
             property.type.fill(code, "$data[$i]", "$destination.${property.name}", false)
         }
     }
