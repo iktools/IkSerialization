@@ -10,10 +10,11 @@ import com.ikcode.serialization.processor.builders.PropertyInfo
 import com.ikcode.serialization.processor.types.TypeUtil
 import com.squareup.kotlinpoet.ksp.toClassName
 
-class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil) {
+class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: Set<KSClassDeclaration>) {
     val namespace = declaration.packageName.asString()
     val name = declaration.simpleName.asString()
     val kpType = declaration.toClassName()
+    private val justType = declaration.asStarProjectedType()
 
     val isEnum = declaration.classKind == ClassKind.ENUM_CLASS
     val isProxy = declaration.asStarProjectedType().isAssignableFrom(types.proxyType)
@@ -21,6 +22,12 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil) {
     val outFileName = this.name + "_Packer"
 
     val constructorParams = declaration.primaryConstructor?.parameters ?: listOf()
+    val subclasses = allClasses.filter {
+        val type = it.asStarProjectedType()
+        type != justType && justType.isAssignableFrom(type)
+    }.map {
+        types[it.asStarProjectedType()]
+    }
 
     @OptIn(KspExperimental::class)
     val ownProperties = declaration.getDeclaredProperties().filter {

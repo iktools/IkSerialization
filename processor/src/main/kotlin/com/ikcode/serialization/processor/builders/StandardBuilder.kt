@@ -17,17 +17,17 @@ class StandardBuilder(
             .addStatement("packMap.putAll(packOwnData(obj as ${classInfo.name}, session))")
         //TODO
         /*for(superClass in superclasses)
-            funBuilder.addStatement("packMap.putAll(${superClass.fullName}_Packer().packOwnData(obj, session))")
-        if (subclasses.any()) {
+            funBuilder.addStatement("packMap.putAll(${superClass.fullName}_Packer().packOwnData(obj, session))")*/
+        if (classInfo.subclasses.isNotEmpty()) {
             funBuilder.beginControlFlow("when(obj)")
-            for (subclass in subclasses)
-                funBuilder.addStatement("is ${subclass.fullName} -> packMap.putAll(${subclass.fullName}_Packer().packOwnData(obj, session))")
+            for (subclass in classInfo.subclasses)
+                funBuilder.addStatement("is ${subclass.fullName} -> packMap.putAll(${subclass.fullName}_Packer().packOwnData(obj, session))", subclass.)
             if (classInfo.isOpen)
                 funBuilder.addStatement("else -> packMap.putAll(otherSubclasses[obj.javaClass]?.packOwnData(obj, session) ?: throw Exception(\"Unknown·${classInfo.name}·subtype\"))")
             else
                 funBuilder.addStatement("else -> throw Exception(\"Unknown ${classInfo.name} subtype\")")
             funBuilder.endControlFlow()
-        }*/
+        }
         funBuilder.endControlFlow()
     }
 

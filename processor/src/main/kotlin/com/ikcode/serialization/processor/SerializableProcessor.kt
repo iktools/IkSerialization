@@ -18,6 +18,7 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
         val symbols = resolver
             .getSymbolsWithAnnotation(SerializableClass::class.java.canonicalName)
             .filterIsInstance<KSClassDeclaration>()
+            .toSet()
 
         if (!symbols.iterator().hasNext())
             return emptyList()
@@ -26,7 +27,7 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
 
         logger = environment.logger
         val packers = symbols.map {
-            PackerInfo(it, types)
+            PackerInfo(it, types, symbols)
         }
 
         val allSourceFiles = resolver.getAllFiles().toList().toTypedArray()
@@ -49,6 +50,32 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
 
             file.close()
         }
+
+        /*val resourceFile = "META-INF/services/$service"
+        val filer = processingEnv.filer
+        try {
+            val existingFile = filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceFile)
+            if (existingFile.lastModified != 0L) {
+                val reader = BufferedReader(InputStreamReader(existingFile.openInputStream(), UTF_8))
+                interfaceImplementations[service]!! += reader.readLines()
+                    .map { it.substringBefore('#').trim() }
+                    .filter { it.isNotEmpty() }
+
+                reader.close()
+            }
+        } catch (e: IOException) {
+            processingEnv.messager.printMessage(Diagnostic.Kind.WARNING, e.message + e.stackTraceToString())
+        }
+
+        val metaFile = filer
+            .createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/services/$service")
+            .openWriter()
+        implementations.forEach {
+            metaFile.write(it)
+            metaFile.appendLine()
+        }
+        metaFile.flush()
+        metaFile.close()*/
 
         return symbols.filterNot { it.validate() }.toList()
     }
