@@ -18,7 +18,7 @@ class StandardBuilder(
         //TODO
         /*for(superClass in superclasses)
             funBuilder.addStatement("packMap.putAll(${superClass.fullName}_Packer().packOwnData(obj, session))")*/
-        if (classInfo.subclasses.isNotEmpty()) {
+        /*if (classInfo.subclasses.isNotEmpty()) {
             funBuilder.beginControlFlow("when(obj)")
             for (subclass in classInfo.subclasses)
                 funBuilder.addStatement("is ${subclass.fullName} -> packMap.putAll(${subclass.fullName}_Packer().packOwnData(obj, session))", subclass.)
@@ -27,7 +27,7 @@ class StandardBuilder(
             else
                 funBuilder.addStatement("else -> throw Exception(\"Unknown ${classInfo.name} subtype\")")
             funBuilder.endControlFlow()
-        }
+        }*/
         funBuilder.endControlFlow()
     }
 
@@ -131,7 +131,7 @@ class StandardBuilder(
                 .addStatement("obj as $this.classInfo.kpType")
         }
 
-        for (field in classInfo.ownProperties) {
+        for (field in classInfo.allProperties) {
             val instantiate = field.isMutable && !field.inConstructor
             val fill = field.type.fillable
 
@@ -186,7 +186,7 @@ class StandardBuilder(
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("obj as $targetClass")
         }*/
-        for (field in classInfo.ownProperties) {
+        for (field in classInfo.allProperties) {
             val name = field.name
 
             val getValue = if (field.isMutable && field.type.isNullable)
@@ -209,8 +209,8 @@ class StandardBuilder(
             if (field.type.isNullable)
                 packOwnFunc.endControlFlow()
         }
-        /*if (superclasses.any() || objInterface != null || classInfo.referenceOnlyFields.any())
-            packOwnFunc.addStatement("packMap[\"@type\"] = \"${classInfo.name}\"")*/
+        if (classInfo.superclasses.any() || objInterface != null || classInfo.referenceOnlyFields.any())
+            packOwnFunc.addStatement("packMap[\"@type\"] = \"${classInfo.name}\"")
         packOwnFunc.addStatement("return packMap")
 
         val typeNameFunc = FunSpec.builder("typeName")

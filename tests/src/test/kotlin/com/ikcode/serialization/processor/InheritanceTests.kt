@@ -3,6 +3,10 @@ package com.ikcode.serialization.processor
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
+import com.ikcode.serialization.processor.examples.inheritance.AbstractData_Packer
+import com.ikcode.serialization.processor.examples.inheritance.ConcreteData
+import com.ikcode.serialization.processor.examples.inheritance.ConcreteData_Packer
+import com.ikcode.serialization.processor.examples.simple.ObjectSample
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,8 +16,8 @@ class InheritanceTests {
     //TODO
     /*@Test
     fun interfaceImplementationTests() {
-        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData1 = ObjectSample()
+        val referencedData2 = ObjectSample()
         val data = ImplementationData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2
@@ -70,14 +74,14 @@ class InheritanceTests {
         assertEquals(obj2, unpacked.nullableValue2)
         assertEquals(null, unpacked.nullableNullC2)
         assertEquals(null, unpacked.nullableNull2)
-    }
+    }*/
 
     @Test
     fun concreteClassTests() {
-        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData3 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData4 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData1 = ObjectSample(1)
+        val referencedData2 = ObjectSample(2)
+        val referencedData3 = ObjectSample(3)
+        val referencedData4 = ObjectSample(4)
         val data = ConcreteData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2,
@@ -183,10 +187,10 @@ class InheritanceTests {
 
     @Test
     fun baseConcretizationTests() {
-        val referencedData1 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData2 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData3 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
-        val referencedData4 = com.ikcode.serialization.processor.examples.simple.ObjectSample()
+        val referencedData1 = ObjectSample(1)
+        val referencedData2 = ObjectSample(2)
+        val referencedData3 = ObjectSample(3)
+        val referencedData4 = ObjectSample(4)
         val data = ConcreteData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2,
@@ -253,5 +257,5 @@ class InheritanceTests {
         assertEquals(obj4, unpacked.derivedNullableValue2)
         assertEquals(null, unpacked.derivedNullableNullC2)
         assertEquals(null, unpacked.derivedNullableNull2)
-    }*/
+    }
 }

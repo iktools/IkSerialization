@@ -5,6 +5,7 @@ import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.ikcode.serialization.core.annotations.SerializableClass
+import com.ikcode.serialization.processor.builders.AbstractBuilder
 import com.ikcode.serialization.processor.builders.EnumBuilder
 import com.ikcode.serialization.processor.builders.ProxyBuilder
 import com.ikcode.serialization.processor.builders.StandardBuilder
@@ -35,6 +36,7 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
             val fileText = when {
                 packer.isEnum -> EnumBuilder(packer)
                 packer.isProxy -> ProxyBuilder(packer)
+                packer.isAbstract -> AbstractBuilder(packer)
                 else -> StandardBuilder(packer)
             }.file()
 
