@@ -6,6 +6,8 @@ import com.ikcode.serialization.core.session.UnpackingSession
 import com.ikcode.serialization.processor.examples.inheritance.AbstractData_Packer
 import com.ikcode.serialization.processor.examples.inheritance.ConcreteData
 import com.ikcode.serialization.processor.examples.inheritance.ConcreteData_Packer
+import com.ikcode.serialization.processor.examples.inheritance.ImplementationData
+import com.ikcode.serialization.processor.examples.inheritance.ImplementationData_Packer
 import com.ikcode.serialization.processor.examples.simple.ObjectSample
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -13,11 +15,10 @@ import kotlin.test.assertEquals
 class InheritanceTests {
     //TODO test unpacking from base type
 
-    //TODO
-    /*@Test
+    @Test
     fun interfaceImplementationTests() {
-        val referencedData1 = ObjectSample()
-        val referencedData2 = ObjectSample()
+        val referencedData1 = ObjectSample(1)
+        val referencedData2 = ObjectSample(2)
         val data = ImplementationData(
             referencedData1, referencedData1, null, referencedData1,
             referencedData2, referencedData2, null, referencedData2
@@ -74,7 +75,7 @@ class InheritanceTests {
         assertEquals(obj2, unpacked.nullableValue2)
         assertEquals(null, unpacked.nullableNullC2)
         assertEquals(null, unpacked.nullableNull2)
-    }*/
+    }
 
     @Test
     fun concreteClassTests() {
