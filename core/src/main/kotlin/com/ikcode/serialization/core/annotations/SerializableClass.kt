@@ -3,7 +3,7 @@ package com.ikcode.serialization.core.annotations
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 annotation class SerializableClass(
     val isOpen: Boolean = false,
     val service: KClass<*> = SerializableClass::class,

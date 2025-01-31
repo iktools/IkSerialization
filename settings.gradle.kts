@@ -26,3 +26,5 @@ include(":core")
 
 rootProject.name = "IkSerialization"
 include("tests")
+include("tests2")
+include("tests2")

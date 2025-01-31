@@ -16,6 +16,8 @@ abstract class ABuilder(
     abstract fun fill(funBuilder: FunSpec.Builder)
     open fun extras(typeBuilder: TypeSpec.Builder) {}
 
+    protected open val typeBuilder get() = TypeSpec.classBuilder(this.classInfo.outFileName)
+
     fun file(): FileSpec {
         val packFunc = FunSpec.builder("pack")
             .addParameter("obj", this.classInfo.kpType)
@@ -40,7 +42,7 @@ abstract class ABuilder(
             .addParameter("session", UnpackingSession::class)
         this.fill(fillDataFunc)
 
-        val type = TypeSpec.classBuilder(this.classInfo.outFileName)
+        val type = typeBuilder
             .addFunction(packFunc.build())
             .addFunction(unpackFunc.build())
             .addFunction(instantiateFunc.build())

@@ -7,6 +7,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.processor.builders.AbstractBuilder
 import com.ikcode.serialization.processor.builders.EnumBuilder
+import com.ikcode.serialization.processor.builders.InterfaceBuilder
 import com.ikcode.serialization.processor.builders.ProxyBuilder
 import com.ikcode.serialization.processor.builders.StandardBuilder
 import com.ikcode.serialization.processor.types.TypeUtil
@@ -27,30 +28,47 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
         val types = TypeUtil(resolver)
 
         logger = environment.logger
-        val packers = symbols.map {
-            PackerInfo(it, types, symbols)
+        val packers = symbols.associate {
+            logger.warn("Gle ${it.simpleName.asString()} ${it.getAllSuperTypes().joinToString()} | ${it.superTypes.joinToString()}")
+
+            val info = PackerInfo(it, types, symbols)
+            info.justType to info
         }
 
         val allSourceFiles = resolver.getAllFiles().toList().toTypedArray()
-        packers.forEach { packer ->
+        packers.values.forEach { packer ->
             val fileText = when {
                 packer.isEnum -> EnumBuilder(packer)
                 packer.isProxy -> ProxyBuilder(packer)
                 packer.isAbstract -> AbstractBuilder(packer)
-                else -> StandardBuilder(packer)
+                else -> StandardBuilder(packer, packers)
             }.file()
 
-            val file = environment.codeGenerator.createNewFile(
+            environment.codeGenerator.createNewFile(
                 dependencies = Dependencies(false, *allSourceFiles),
                 packageName = packer .namespace,
                 fileName = packer.outFileName
-            )
-
-            file.bufferedWriter().use {
-                fileText.writeTo(it)
+            ).apply {
+                bufferedWriter().use {
+                    fileText.writeTo(it)
+                }
+                close()
             }
 
-            file.close()
+            if (packer.isAbstract) {
+                val interfaceFileText = InterfaceBuilder(packer).file()
+
+                environment.codeGenerator.createNewFile(
+                    dependencies = Dependencies(false, *allSourceFiles),
+                    packageName = packer.namespace,
+                    fileName = packer.interfaceFileName
+                ).apply {
+                    bufferedWriter().use {
+                        interfaceFileText.writeTo(it)
+                    }
+                    close()
+                }
+            }
         }
 
         /*val resourceFile = "META-INF/services/$service"

@@ -8,12 +8,12 @@ import com.ikcode.serialization.processor.examples.inheritance.ConcreteData
 import com.ikcode.serialization.processor.examples.inheritance.ConcreteData_Packer
 import com.ikcode.serialization.processor.examples.inheritance.ImplementationData
 import com.ikcode.serialization.processor.examples.inheritance.ImplementationData_Packer
+import com.ikcode.serialization.processor.examples.inheritance.InterfaceSample_Packer
 import com.ikcode.serialization.processor.examples.simple.ObjectSample
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InheritanceTests {
-    //TODO test unpacking from base type
 
     @Test
     fun interfaceImplementationTests() {
@@ -54,27 +54,49 @@ class InheritanceTests {
         assert(!packed.containsKey("nullableNullC2"))
         assert(!packed.containsKey("nullableNull2"))
 
-        val unpacked = ImplementationData_Packer().unpack(
+        val unpackedA = InterfaceSample_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        ) as ImplementationData
+
+        val obj1a = unpackedA.readonlyC1
+        assertEquals(obj1a, unpackedA.mutableC1)
+        assertEquals(obj1a, unpackedA.nullableValueC1)
+        assertEquals(obj1a, unpackedA.mutable1)
+        assertEquals(obj1a, unpackedA.nullableValue1)
+        assertEquals(null, unpackedA.nullableNullC1)
+        assertEquals(null, unpackedA.nullableNull1)
+
+        val obj2a = unpackedA.readonlyC2
+        assert(obj1a != obj2a)
+        assertEquals(obj2a, unpackedA.mutableC2)
+        assertEquals(obj2a, unpackedA.nullableValueC2)
+        assertEquals(obj2a, unpackedA.mutable2)
+        assertEquals(obj2a, unpackedA.nullableValue2)
+        assertEquals(null, unpackedA.nullableNullC2)
+        assertEquals(null, unpackedA.nullableNull2)
+
+        val unpackedB = ImplementationData_Packer().unpack(
             pointer,
             UnpackingSession(session.referencedData)
         )
 
-        val obj1 = unpacked.readonlyC1
-        assertEquals(obj1, unpacked.mutableC1)
-        assertEquals(obj1, unpacked.nullableValueC1)
-        assertEquals(obj1, unpacked.mutable1)
-        assertEquals(obj1, unpacked.nullableValue1)
-        assertEquals(null, unpacked.nullableNullC1)
-        assertEquals(null, unpacked.nullableNull1)
+        val obj1b = unpackedB.readonlyC1
+        assertEquals(obj1b, unpackedB.mutableC1)
+        assertEquals(obj1b, unpackedB.nullableValueC1)
+        assertEquals(obj1b, unpackedB.mutable1)
+        assertEquals(obj1b, unpackedB.nullableValue1)
+        assertEquals(null, unpackedB.nullableNullC1)
+        assertEquals(null, unpackedB.nullableNull1)
 
-        val obj2 = unpacked.readonlyC2
-        assert(obj1 != obj2)
-        assertEquals(obj2, unpacked.mutableC2)
-        assertEquals(obj2, unpacked.nullableValueC2)
-        assertEquals(obj2, unpacked.mutable2)
-        assertEquals(obj2, unpacked.nullableValue2)
-        assertEquals(null, unpacked.nullableNullC2)
-        assertEquals(null, unpacked.nullableNull2)
+        val obj2b = unpackedB.readonlyC2
+        assert(obj1b != obj2b)
+        assertEquals(obj2b, unpackedB.mutableC2)
+        assertEquals(obj2b, unpackedB.nullableValueC2)
+        assertEquals(obj2b, unpackedB.mutable2)
+        assertEquals(obj2b, unpackedB.nullableValue2)
+        assertEquals(null, unpackedB.nullableNullC2)
+        assertEquals(null, unpackedB.nullableNull2)
     }
 
     @Test
@@ -146,44 +168,84 @@ class InheritanceTests {
         assert(!packed.containsKey("derivedNullableNullC2"))
         assert(!packed.containsKey("derivedNullableNull2"))
 
-        val unpacked = ConcreteData_Packer().unpack(
+        val unpackedA = AbstractData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        ) as ConcreteData
+
+        val obj1a = unpackedA.baseReadonlyC1
+        assertEquals(obj1a, unpackedA.baseMutableC1)
+        assertEquals(obj1a, unpackedA.baseNullableValueC1)
+        assertEquals(obj1a, unpackedA.baseMutable1)
+        assertEquals(obj1a, unpackedA.baseNullableValue1)
+        assertEquals(null, unpackedA.baseNullableNullC1)
+        assertEquals(null, unpackedA.baseNullableNull1)
+
+        val obj2a = unpackedA.baseReadonlyC2
+        assert(obj1a != obj2a)
+        assertEquals(obj2a, unpackedA.baseMutableC2)
+        assertEquals(obj2a, unpackedA.baseNullableValueC2)
+        assertEquals(obj2a, unpackedA.baseMutable2)
+        assertEquals(obj2a, unpackedA.baseNullableValue2)
+        assertEquals(null, unpackedA.baseNullableNullC2)
+        assertEquals(null, unpackedA.baseNullableNull2)
+
+        val obj3a = unpackedA.derivedReadonlyC1
+        assert(obj2a != obj3a)
+        assertEquals(obj3a, unpackedA.derivedMutableC1)
+        assertEquals(obj3a, unpackedA.derivedNullableValueC1)
+        assertEquals(obj3a, unpackedA.derivedMutable1)
+        assertEquals(obj3a, unpackedA.derivedNullableValue1)
+        assertEquals(null, unpackedA.derivedNullableNullC1)
+        assertEquals(null, unpackedA.derivedNullableNull1)
+
+        val obj4a = unpackedA.derivedReadonlyC2
+        assert(obj3a != obj4a)
+        assertEquals(obj4a, unpackedA.derivedMutableC2)
+        assertEquals(obj4a, unpackedA.derivedNullableValueC2)
+        assertEquals(obj4a, unpackedA.derivedMutable2)
+        assertEquals(obj4a, unpackedA.derivedNullableValue2)
+        assertEquals(null, unpackedA.derivedNullableNullC2)
+        assertEquals(null, unpackedA.derivedNullableNull2)
+
+        val unpackedB = ConcreteData_Packer().unpack(
             pointer,
             UnpackingSession(session.referencedData)
         )
 
-        val obj1 = unpacked.baseReadonlyC1
-        assertEquals(obj1, unpacked.baseMutableC1)
-        assertEquals(obj1, unpacked.baseNullableValueC1)
-        assertEquals(obj1, unpacked.baseMutable1)
-        assertEquals(obj1, unpacked.baseNullableValue1)
-        assertEquals(null, unpacked.baseNullableNullC1)
-        assertEquals(null, unpacked.baseNullableNull1)
+        val obj1b = unpackedB.baseReadonlyC1
+        assertEquals(obj1b, unpackedB.baseMutableC1)
+        assertEquals(obj1b, unpackedB.baseNullableValueC1)
+        assertEquals(obj1b, unpackedB.baseMutable1)
+        assertEquals(obj1b, unpackedB.baseNullableValue1)
+        assertEquals(null, unpackedB.baseNullableNullC1)
+        assertEquals(null, unpackedB.baseNullableNull1)
 
-        val obj2 = unpacked.baseReadonlyC2
-        assert(obj1 != obj2)
-        assertEquals(obj2, unpacked.baseMutableC2)
-        assertEquals(obj2, unpacked.baseNullableValueC2)
-        assertEquals(obj2, unpacked.baseMutable2)
-        assertEquals(obj2, unpacked.baseNullableValue2)
-        assertEquals(null, unpacked.baseNullableNullC2)
-        assertEquals(null, unpacked.baseNullableNull2)
+        val obj2b = unpackedB.baseReadonlyC2
+        assert(obj1b != obj2b)
+        assertEquals(obj2b, unpackedB.baseMutableC2)
+        assertEquals(obj2b, unpackedB.baseNullableValueC2)
+        assertEquals(obj2b, unpackedB.baseMutable2)
+        assertEquals(obj2b, unpackedB.baseNullableValue2)
+        assertEquals(null, unpackedB.baseNullableNullC2)
+        assertEquals(null, unpackedB.baseNullableNull2)
 
-        val obj3 = unpacked.derivedReadonlyC1
-        assertEquals(obj3, unpacked.derivedMutableC1)
-        assertEquals(obj3, unpacked.derivedNullableValueC1)
-        assertEquals(obj3, unpacked.derivedMutable1)
-        assertEquals(obj3, unpacked.derivedNullableValue1)
-        assertEquals(null, unpacked.derivedNullableNullC1)
-        assertEquals(null, unpacked.derivedNullableNull1)
+        val obj3b = unpackedB.derivedReadonlyC1
+        assertEquals(obj3b, unpackedB.derivedMutableC1)
+        assertEquals(obj3b, unpackedB.derivedNullableValueC1)
+        assertEquals(obj3b, unpackedB.derivedMutable1)
+        assertEquals(obj3b, unpackedB.derivedNullableValue1)
+        assertEquals(null, unpackedB.derivedNullableNullC1)
+        assertEquals(null, unpackedB.derivedNullableNull1)
 
-        val obj4 = unpacked.derivedReadonlyC2
-        assert(obj3 != obj4)
-        assertEquals(obj4, unpacked.derivedMutableC2)
-        assertEquals(obj4, unpacked.derivedNullableValueC2)
-        assertEquals(obj4, unpacked.derivedMutable2)
-        assertEquals(obj4, unpacked.derivedNullableValue2)
-        assertEquals(null, unpacked.derivedNullableNullC2)
-        assertEquals(null, unpacked.derivedNullableNull2)
+        val obj4b = unpackedB.derivedReadonlyC2
+        assert(obj3b != obj4b)
+        assertEquals(obj4b, unpackedB.derivedMutableC2)
+        assertEquals(obj4b, unpackedB.derivedNullableValueC2)
+        assertEquals(obj4b, unpackedB.derivedMutable2)
+        assertEquals(obj4b, unpackedB.derivedNullableValue2)
+        assertEquals(null, unpackedB.derivedNullableNullC2)
+        assertEquals(null, unpackedB.derivedNullableNull2)
     }
 
     @Test

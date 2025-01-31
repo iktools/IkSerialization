@@ -78,5 +78,4 @@ class TypeUtil(
             else -> ClassInfo(type)
         }
     }
-
 }

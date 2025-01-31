@@ -1,13 +1,19 @@
 package com.ikcode.serialization.processor.builders
 
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.getAnnotationsByType
+import com.google.devtools.ksp.symbol.KSType
+import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.processor.PackerInfo
+import com.ikcode.serialization.processor.logger
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 class StandardBuilder(
-    classInfo: PackerInfo
+    classInfo: PackerInfo,
+    private val packers: Map<KSType, PackerInfo>
 ): ABuilder(classInfo) {
     //TODO
     private val objInterface = null
@@ -175,6 +181,15 @@ class StandardBuilder(
     }
 
     override fun extras(typeBuilder: TypeSpec.Builder) {
+        if (classInfo.superclasses.isNotEmpty())
+            logger.warn("${classInfo.name} extends ${classInfo.superclasses.joinToString()}")
+        this.classInfo.superclasses.forEach {
+            val interfaceFileName = "I${it.declaration.simpleName.asString()}_Packer"
+            val interfaceType = ClassName(it.declaration.packageName.asString(), interfaceFileName)
+            typeBuilder.addSuperinterface(interfaceType)
+        }
+
+        //TODO remove packOwnFunc
         val packOwnFunc = FunSpec.builder("packOwnData")
             .addParameter("obj", this.objInterface ?: this.classInfo.kpType)
             .addParameter("session", PackingSession::class)
@@ -216,6 +231,8 @@ class StandardBuilder(
         val typeNameFunc = FunSpec.builder("typeName")
             .returns(String::class)
             .addStatement("return \"${classInfo.name}\"")
+        if (this.classInfo.superclasses.isNotEmpty())
+            typeNameFunc.addModifiers(KModifier.OVERRIDE)
 
         //TODO
         /*if (classInfo.service != null) {
