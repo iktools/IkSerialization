@@ -1,12 +1,8 @@
 package com.ikcode.serialization.processor.builders
 
 import com.ikcode.serialization.processor.PackerInfo
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.WildcardTypeName
-import com.squareup.kotlinpoet.asClassName
 
 class InterfaceBuilder(
     classInfo: PackerInfo
@@ -33,7 +29,7 @@ class InterfaceBuilder(
         typeBuilder
             .addFunction(FunSpec.builder("objType")
                 .addModifiers(KModifier.ABSTRACT)
-                .returns(Class::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(this.classInfo.kpType)))
+                .returns(Class::class.asClassName().parameterizedBy(STAR))
                 .build())
             .addFunction(FunSpec.builder("typeName")
                 .addModifiers(KModifier.ABSTRACT)

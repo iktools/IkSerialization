@@ -6,6 +6,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
+import com.ikcode.serialization.core.session.UnpackingSession
 import com.ikcode.serialization.processor.PackerInfo
 import com.ikcode.serialization.processor.logger
 import com.squareup.kotlinpoet.*
@@ -20,7 +21,7 @@ class StandardBuilder(
 
     override fun pack(funBuilder: FunSpec.Builder) {
         funBuilder.beginControlFlow("return session.referenceFor(obj, \"${classInfo.name}\") { packMap ->")
-            .addStatement("packMap.putAll(packOwnData(obj as ${classInfo.name}, session))")
+            .addStatement("packMap.putAll(packOwnData(obj, session))")
         //TODO
         /*for(superClass in superclasses)
             funBuilder.addStatement("packMap.putAll(${superClass.fullName}_Packer().packOwnData(obj, session))")*/
@@ -41,7 +42,7 @@ class StandardBuilder(
         funBuilder.addStatement("val obj = this.instantiate(packedData, session)")
             .addStatement("this.fillData(obj, session)")
             .addStatement("return obj")
-        if (this.objInterface != null)
+        if (this.classInfo.superclasses.any { it.isOpen })
             funBuilder.addModifiers(KModifier.OVERRIDE)
     }
 
@@ -52,7 +53,7 @@ class StandardBuilder(
             .addStatement("val objData = session.dereference(name) as Map<*, *>")
             .addStatement("val existingObj = session.getInstance(name)")
             .addStatement("if (existingObj != null) return existingObj as ${classInfo.name}")
-        if (this.objInterface != null)
+        if (this.classInfo.superclasses.any { it.isOpen })
             funBuilder.addModifiers(KModifier.OVERRIDE)
         when {
             //TODO
@@ -183,10 +184,29 @@ class StandardBuilder(
     override fun extras(typeBuilder: TypeSpec.Builder) {
         if (classInfo.superclasses.isNotEmpty())
             logger.warn("${classInfo.name} extends ${classInfo.superclasses.joinToString()}")
-        this.classInfo.superclasses.forEach {
+        this.classInfo.superclasses.filter {
+            it.isOpen
+        }.forEach {
             val interfaceFileName = "I${it.declaration.simpleName.asString()}_Packer"
             val interfaceType = ClassName(it.declaration.packageName.asString(), interfaceFileName)
             typeBuilder.addSuperinterface(interfaceType)
+
+            typeBuilder.addFunction(FunSpec.builder("pack")
+                .addParameter("obj", it.kpType)
+                .addParameter("session", PackingSession::class)
+                .addModifiers(KModifier.OVERRIDE)
+                .returns(Any::class)
+                .addStatement("return this.pack(obj as %T, session)", this.classInfo.kpType)
+                .build()
+            )
+
+            typeBuilder.addFunction(FunSpec.builder("fillData")
+                .addParameter("obj", it.kpType)
+                .addParameter("session", UnpackingSession::class)
+                .addModifiers(KModifier.OVERRIDE)
+                .addStatement("this.fillData(obj as %T, session)", this.classInfo.kpType)
+                .build()
+            )
         }
 
         //TODO remove packOwnFunc
@@ -231,8 +251,17 @@ class StandardBuilder(
         val typeNameFunc = FunSpec.builder("typeName")
             .returns(String::class)
             .addStatement("return \"${classInfo.name}\"")
-        if (this.classInfo.superclasses.isNotEmpty())
+
+        if (this.classInfo.superclasses.any { it.isOpen }) {
             typeNameFunc.addModifiers(KModifier.OVERRIDE)
+
+            typeBuilder.addFunction(FunSpec.builder("objType")
+                .addModifiers(KModifier.OVERRIDE)
+                .returns(Class::class.asClassName().parameterizedBy(STAR))
+                .addStatement("return %T::class.java", this.classInfo.kpType)
+                .build()
+            )
+        }
 
         //TODO
         /*if (classInfo.service != null) {

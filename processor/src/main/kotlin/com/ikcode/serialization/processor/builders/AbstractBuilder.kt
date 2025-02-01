@@ -2,15 +2,9 @@ package com.ikcode.serialization.processor.builders
 
 import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.processor.PackerInfo
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.WildcardTypeName
-import com.squareup.kotlinpoet.asTypeName
 
 class AbstractBuilder(
     classInfo: PackerInfo
@@ -67,14 +61,11 @@ class AbstractBuilder(
                         PropertySpec.builder(
                             "otherSubclasses",
                             Map::class.asTypeName()
-                                .plusParameter(
-                                    Class::class.asTypeName()
-                                        .parameterizedBy(WildcardTypeName.producerOf(this.classInfo.kpType))
-                                )
+                                .plusParameter(Class::class.asClassName().parameterizedBy(STAR))
                                 .plusParameter(this.classInfo.interfaceType),
                             KModifier.PRIVATE
                         )
-                            .initializer("java.util.ServiceLoader.load(I${classInfo.name}_Packer::class.java).associate { it.objType() to it }")
+                            .initializer("java.util.ServiceLoader.load(I${classInfo.name}_Packer::class.java).associateBy { it.objType() }")
                             .build()
                     )
                     .addProperty(

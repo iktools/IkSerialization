@@ -29,8 +29,6 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
 
         logger = environment.logger
         val packers = symbols.associate {
-            logger.warn("Gle ${it.simpleName.asString()} ${it.getAllSuperTypes().joinToString()} | ${it.superTypes.joinToString()}")
-
             val info = PackerInfo(it, types, symbols)
             info.justType to info
         }

@@ -39,30 +39,13 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     }.map {
         types[it.asStarProjectedType()] as ClassInfo
     }
-    @OptIn(KspExperimental::class)
-    val superclasses = declaration.getAllSuperTypes().map {
-        it.starProjection()
+    val superclasses = declaration.superTypes.map {
+        SuperclassInfo(it.resolve().starProjection())
     }.filter {
-        val declaration = when (val declaration = it.declaration) {
-            is KSTypeAlias -> declaration.findActualType()
-            else -> declaration
-        }
-        val annotation = declaration.getAnnotationsByType(SerializableClass::class).firstOrNull()
-        if (annotation != null && annotation.isOpen)
-            logger.warn("Oho ${this.name} vs $it $declaration")
-
-        annotation != null && annotation.isOpen && (
-            Modifier.ABSTRACT in declaration.modifiers || (
-                declaration is KSClassDeclaration && declaration.classKind == ClassKind.INTERFACE
-            )
+        Modifier.ABSTRACT in it.declaration.modifiers || (
+                it.declaration is KSClassDeclaration && it.declaration.classKind == ClassKind.INTERFACE
         )
     }.toList()
-    /*.filter {
-        val type = it.asStarProjectedType()
-        type != justType && type.isAssignableFrom(justType)
-    }.map {
-        types[it.asStarProjectedType()] as ClassInfo
-    }*/
 
     @OptIn(KspExperimental::class)
     val allProperties = declaration.getAllProperties().filter {
