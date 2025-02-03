@@ -14,6 +14,8 @@ class SuperclassInfo(type: KSType) {
         else -> superDeclaration
     }
     val kpType = type.toTypeName()
+    val namespace = declaration.packageName.asString()
+    val name = type.toString()
 
     @OptIn(KspExperimental::class)
     val annotation = this.declaration.getAnnotationsByType(SerializableClass::class).firstOrNull()

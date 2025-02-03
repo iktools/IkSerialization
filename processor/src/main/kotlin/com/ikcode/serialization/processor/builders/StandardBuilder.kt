@@ -182,8 +182,6 @@ class StandardBuilder(
     }
 
     override fun extras(typeBuilder: TypeSpec.Builder) {
-        if (classInfo.superclasses.isNotEmpty())
-            logger.warn("${classInfo.name} extends ${classInfo.superclasses.joinToString()}")
         this.classInfo.superclasses.filter {
             it.isOpen
         }.forEach {

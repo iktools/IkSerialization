@@ -4,6 +4,7 @@ import com.google.devtools.ksp.*
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFile
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.processor.builders.AbstractBuilder
 import com.ikcode.serialization.processor.builders.EnumBuilder
@@ -11,6 +12,7 @@ import com.ikcode.serialization.processor.builders.InterfaceBuilder
 import com.ikcode.serialization.processor.builders.ProxyBuilder
 import com.ikcode.serialization.processor.builders.StandardBuilder
 import com.ikcode.serialization.processor.types.TypeUtil
+import com.squareup.kotlinpoet.FileSpec
 
 //TODO remove
 lateinit var logger: KSPLogger
@@ -42,59 +44,48 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
                 else -> StandardBuilder(packer, packers)
             }.file()
 
-            environment.codeGenerator.createNewFile(
-                dependencies = Dependencies(false, *allSourceFiles),
-                packageName = packer .namespace,
-                fileName = packer.outFileName
-            ).apply {
-                bufferedWriter().use {
-                    fileText.writeTo(it)
-                }
-                close()
-            }
+            write(packer.namespace, packer.outFileName, fileText, allSourceFiles)
 
             if (packer.isAbstract) {
                 val interfaceFileText = InterfaceBuilder(packer).file()
+                write(packer.namespace, packer.interfaceFileName, interfaceFileText, allSourceFiles)
+            }
+        }
 
-                environment.codeGenerator.createNewFile(
-                    dependencies = Dependencies(false, *allSourceFiles),
-                    packageName = packer.namespace,
-                    fileName = packer.interfaceFileName
-                ).apply {
-                    bufferedWriter().use {
-                        interfaceFileText.writeTo(it)
+        packers.values.flatMap { packer ->
+            packer.superclasses.filter { it.isOpen }.map { it to packer }
+        }.groupBy {
+            it.first
+        }.forEach { (service, implementations) ->
+            environment.codeGenerator.createNewFile(
+                Dependencies.ALL_FILES,
+                "",
+                "META-INF/services/${service.namespace}.I${service.name}_Packer", //TODO
+                ""
+            ).apply {
+                bufferedWriter().use { writer ->
+                    implementations.forEach {
+                        writer.write("${it.second.namespace}.${it.second.name}_Packer")
+                        writer.newLine()
                     }
-                    close()
                 }
+                close()
             }
         }
-
-        /*val resourceFile = "META-INF/services/$service"
-        val filer = processingEnv.filer
-        try {
-            val existingFile = filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceFile)
-            if (existingFile.lastModified != 0L) {
-                val reader = BufferedReader(InputStreamReader(existingFile.openInputStream(), UTF_8))
-                interfaceImplementations[service]!! += reader.readLines()
-                    .map { it.substringBefore('#').trim() }
-                    .filter { it.isNotEmpty() }
-
-                reader.close()
-            }
-        } catch (e: IOException) {
-            processingEnv.messager.printMessage(Diagnostic.Kind.WARNING, e.message + e.stackTraceToString())
-        }
-
-        val metaFile = filer
-            .createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/services/$service")
-            .openWriter()
-        implementations.forEach {
-            metaFile.write(it)
-            metaFile.appendLine()
-        }
-        metaFile.flush()
-        metaFile.close()*/
 
         return symbols.filterNot { it.validate() }.toList()
+    }
+
+    private fun write(namespace: String, fileName: String, fileText: FileSpec, dependencies: Array<KSFile>) {
+        environment.codeGenerator.createNewFile(
+            dependencies = Dependencies.ALL_FILES,
+            packageName = namespace,
+            fileName = fileName
+        ).apply {
+            bufferedWriter().use {
+                fileText.writeTo(it)
+            }
+            close()
+        }
     }
 }

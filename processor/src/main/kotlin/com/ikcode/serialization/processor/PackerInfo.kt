@@ -42,9 +42,8 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     val superclasses = declaration.superTypes.map {
         SuperclassInfo(it.resolve().starProjection())
     }.filter {
-        Modifier.ABSTRACT in it.declaration.modifiers || (
-                it.declaration is KSClassDeclaration && it.declaration.classKind == ClassKind.INTERFACE
-        )
+        Modifier.ABSTRACT in it.declaration.modifiers ||
+        it.declaration is KSClassDeclaration && it.declaration.classKind == ClassKind.INTERFACE
     }.toList()
 
     @OptIn(KspExperimental::class)
