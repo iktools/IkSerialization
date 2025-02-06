@@ -25,7 +25,6 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     val justType = declaration.asStarProjectedType()
 
     val isEnum = declaration.classKind == ClassKind.ENUM_CLASS
-    val isProxy = declaration.asStarProjectedType().isAssignableFrom(types.proxyType)
     val isAbstract = Modifier.ABSTRACT in declaration.modifiers || declaration.classKind == ClassKind.INTERFACE
 
     @OptIn(KspExperimental::class)
@@ -33,18 +32,26 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     val outFileName = this.name + "_Packer" //TODO read from annotation
 
     val constructorParams = declaration.primaryConstructor?.parameters ?: listOf()
+
     val subclasses = allClasses.filter {
         val type = it.asStarProjectedType()
         type != justType && justType.isAssignableFrom(type)
     }.map {
         types[it.asStarProjectedType()] as ClassInfo
     }
+
     val superclasses = declaration.superTypes.map {
         SuperclassInfo(it.resolve().starProjection())
     }.filter {
         Modifier.ABSTRACT in it.declaration.modifiers ||
         it.declaration is KSClassDeclaration && it.declaration.classKind == ClassKind.INTERFACE
     }.toList()
+
+    val proxy = declaration.superTypes.map {
+        it.resolve()
+    }.firstOrNull {
+        it.starProjection() == types.proxyType
+    }
 
     @OptIn(KspExperimental::class)
     val allProperties = declaration.getAllProperties().filter {
