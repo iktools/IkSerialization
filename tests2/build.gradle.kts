@@ -1,10 +1,6 @@
 plugins {
-    kotlin("jvm")
-    id("com.google.devtools.ksp") version "2.0.21-1.0.28"
-}
-
-repositories {
-    mavenCentral()
+    id("buildsrc.convention.kotlin-jvm")
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
@@ -13,11 +9,4 @@ dependencies {
     ksp(project(":processor"))
 
     testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(8)
 }

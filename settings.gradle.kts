@@ -21,10 +21,9 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
+rootProject.name = "IkSerialization"
+
 include(":processor")
 include(":core")
-
-rootProject.name = "IkSerialization"
 include("tests")
-include("tests2")
 include("tests2")

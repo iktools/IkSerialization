@@ -35,6 +35,8 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
             info.justType to info
         }
 
+        //TODO proxy serialization
+        //TODO reference only properties
         val allSourceFiles = resolver.getAllFiles().toList().toTypedArray()
         packers.values.forEach { packer ->
             val fileText = when {
