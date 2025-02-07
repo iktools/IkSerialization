@@ -10,10 +10,7 @@ class IntIterableData(
     @SerializationData val nullableNullC: Iterable<Int>?,
     @SerializationData val nullableValueC: Iterable<Int>?,
 ) {
-    @SerializationData
-    var mutable: Iterable<Int> = listOf()
-    @SerializationData
-    var nullableNull: Iterable<Int>? = listOf()
-    @SerializationData
-    var nullableValue: Iterable<Int>? = listOf()
+    @SerializationData var mutable: Iterable<Int> = listOf()
+    @SerializationData var nullableNull: Iterable<Int>? = listOf()
+    @SerializationData var nullableValue: Iterable<Int>? = listOf()
 }

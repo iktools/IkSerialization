@@ -10,10 +10,7 @@ class IntMapData(
     @SerializationData val nullableNullC: Map<Int, Int>?,
     @SerializationData val nullableValueC: Map<Int, Int>?,
 ) {
-    @SerializationData
-    var mutable: Map<Int, Int> = hashMapOf()
-    @SerializationData
-    var nullableNull: Map<Int, Int>? = hashMapOf()
-    @SerializationData
-    var nullableValue: Map<Int, Int>? = hashMapOf()
+    @SerializationData var mutable: Map<Int, Int> = hashMapOf()
+    @SerializationData var nullableNull: Map<Int, Int>? = hashMapOf()
+    @SerializationData var nullableValue: Map<Int, Int>? = hashMapOf()
 }

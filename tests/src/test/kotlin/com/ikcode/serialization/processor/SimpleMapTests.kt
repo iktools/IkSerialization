@@ -10,8 +10,6 @@ import kotlin.test.assertEquals
 
 class SimpleMapTests {
 
-    //TODO tests where one of key or value is a primitive and other is a reference
-
     @Test
     fun intMapTests() {
         val data = IntMapData(hashMapOf(1 to 10), hashMapOf(2 to 20), null, hashMapOf(3 to 30)).apply {

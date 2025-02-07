@@ -1,7 +1,6 @@
 package com.ikcode.serialization.processor.builders
 
 import com.ikcode.serialization.processor.PackerInfo
-import com.ikcode.serialization.processor.types.ClassInfo
 import com.ikcode.serialization.processor.types.TypeUtil
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
@@ -35,6 +34,6 @@ class ProxyBuilder(
     }
 
     override fun fill(funBuilder: FunSpec.Builder) {
-        // no operation
+        funBuilder.addComment("no operation")
     }
 }

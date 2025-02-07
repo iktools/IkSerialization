@@ -1,14 +1,10 @@
 package com.ikcode.serialization.processor
 
 import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.findActualType
-import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getAnnotationsByType
-import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isAnnotationPresent
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSTypeAlias
 import com.google.devtools.ksp.symbol.Modifier
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
@@ -62,7 +58,4 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
 
     val interfaceFileName = "I${this.name}_Packer"
     val interfaceType = ClassName(this.namespace, interfaceFileName)
-
-    //TODO
-    val referenceOnlyFields = emptyList<PropertyInfo>()
 }

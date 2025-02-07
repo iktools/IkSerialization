@@ -10,10 +10,7 @@ class IntCollectionData(
     @SerializationData val nullableNullC: Collection<Int>?,
     @SerializationData val nullableValueC: Collection<Int>?,
 ) {
-    @SerializationData
-    var mutable: Collection<Int> = listOf()
-    @SerializationData
-    var nullableNull: Collection<Int>? = listOf()
-    @SerializationData
-    var nullableValue: Collection<Int>? = listOf()
+    @SerializationData var mutable: Collection<Int> = listOf()
+    @SerializationData var nullableNull: Collection<Int>? = listOf()
+    @SerializationData var nullableValue: Collection<Int>? = listOf()
 }

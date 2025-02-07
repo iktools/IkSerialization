@@ -35,14 +35,13 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
             info.justType to info
         }
 
-        //TODO reference only properties
         val allSourceFiles = resolver.getAllFiles().toList().toTypedArray()
         packers.values.forEach { packer ->
             val fileText = when {
                 packer.isEnum -> EnumBuilder(packer)
                 packer.proxy != null -> ProxyBuilder(packer, types)
                 packer.isAbstract -> AbstractBuilder(packer)
-                else -> StandardBuilder(packer, packers)
+                else -> StandardBuilder(packer)
             }.file()
 
             write(packer.namespace, packer.outFileName, fileText, allSourceFiles)

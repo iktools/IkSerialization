@@ -2,6 +2,7 @@ package com.ikcode.serialization.processor.types
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.ikcode.serialization.processor.LineBreaker
 import com.ikcode.serialization.processor.builders.PropertyInfo
 import com.squareup.kotlinpoet.CodeBlock
 
@@ -16,7 +17,7 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
     override fun instantiate(code: CodeBlock.Builder, data: String) {
         code.add("%T(", this.kpType)
 
-        var commaCount = this.constructorParams.size - 1
+        val lineBreaker = LineBreaker(this.constructorParams.size)
         this.constructorParams.forEach { paramName ->
             val i = this.allProperties.indexOfFirst {
                 paramName.name == it.ksName
@@ -25,22 +26,20 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
 
             field.type.instantiate(code, "($data as List<*>)[$i]!!")
 
-            if (commaCount > 0) {
+            if (lineBreaker.separate())
                 code.add(", ")
-                commaCount--
-            }
         }
 
         code.add(")")
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
-        val propCount = this.allProperties.size
+        val lineBreaker = LineBreaker(this.allProperties.size)
         code.add("listOf(")
 
-        this.allProperties.forEachIndexed { i, field ->
+        this.allProperties.forEach { field ->
             field.type.pack(code, "$data.${field.name}")
-            if (i < propCount - 1)
+            if (lineBreaker.separate())
                 code.add(", ")
         }
 

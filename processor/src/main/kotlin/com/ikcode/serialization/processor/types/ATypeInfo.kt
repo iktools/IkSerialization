@@ -15,7 +15,4 @@ abstract class ATypeInfo(ksType: KSType) {
     abstract fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean)
 
     val nullAssert get() = if (this.isNullable) "!!" else ""
-
-    //TODO remove
-    val original = ksType
 }

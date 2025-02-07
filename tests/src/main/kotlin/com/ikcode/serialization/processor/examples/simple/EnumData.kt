@@ -10,12 +10,7 @@ class EnumData(
     @SerializationData val nullableNullC: EnumSample?,
     @SerializationData val nullableValueC: EnumSample?,
 ) {
-    @SerializationData
-    var mutable = EnumSample.Value0
-    @SerializationData
-    var nullableNull: EnumSample? =
-        EnumSample.Value0
-    @SerializationData
-    var nullableValue: EnumSample? =
-        EnumSample.Value0
+    @SerializationData var mutable = EnumSample.Value0
+    @SerializationData var nullableNull: EnumSample? = EnumSample.Value0
+    @SerializationData var nullableValue: EnumSample? = EnumSample.Value0
 }

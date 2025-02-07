@@ -4,7 +4,6 @@ import com.ikcode.serialization.core.references.ReferenceAnchor
 import com.ikcode.serialization.core.references.ReferencePointer
 
 class PackingSession {
-
     private val references = HashMap<Any, ReferenceAnchor>()
     private val nextReference = HashMap<String, Int>()
 
@@ -14,16 +13,11 @@ class PackingSession {
     fun referenceFor(obj: Any, key: String, packer: (HashMap<String, Any>) -> Unit) =
         this.references[obj]?.pointer ?: makeReference(obj, key, packer)
 
-    fun registerProduced(obj: Any, key: String, factory: Any) =
-        (this.references[obj]?.pointer ?: makePointer(key)).also {
-            this.references[obj] = ReferenceAnchor(mapOf<String, Any>(), it, references[factory]!!.pointer)
-        }
-
     private fun makeReference(obj: Any, key: String, packer: (HashMap<String, Any>) -> Unit) =
         makePointer(key).also { pointer ->
             val dataContainer = HashMap<String, Any>()
 
-            this.references[obj] = ReferenceAnchor(dataContainer, pointer, null)
+            this.references[obj] = ReferenceAnchor(dataContainer, pointer)
             packer(dataContainer)
             if (dataContainer.values.any { it is Float && it.isNaN() || it is Double && it.isNaN() })
                 throw Exception("NaN is not allowed")

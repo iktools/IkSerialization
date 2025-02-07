@@ -30,7 +30,7 @@ class AbstractBuilder(
         funBuilder.addStatement("val name = (packedData as %T).name", ReferencePointer::class)
             .addStatement("val objData = session.dereference(name) as Map<*, *>")
             .addStatement("val existingObj = session.getInstance(name)")
-            .addStatement("if (existingObj != null) return existingObj as ${classInfo.name}")
+            .addStatement("if (existingObj != null) return existingObj as %T", classInfo.kpType)
 
         funBuilder.beginControlFlow("return when(objData[\"@type\"])")
         for(subclass in classInfo.subclasses)
@@ -54,33 +54,34 @@ class AbstractBuilder(
     }
 
     override fun extras(typeBuilder: TypeSpec.Builder) {
-        if (this.classInfo.isOpen) {
-            typeBuilder.addType(
-                TypeSpec.companionObjectBuilder()
-                    .addProperty(
-                        PropertySpec.builder(
-                            "otherSubclasses",
-                            Map::class.asTypeName()
-                                .plusParameter(Class::class.asClassName().parameterizedBy(STAR))
-                                .plusParameter(this.classInfo.interfaceType),
-                            KModifier.PRIVATE
-                        )
-                            .initializer("java.util.ServiceLoader.load(I${classInfo.name}_Packer::class.java).associateBy { it.objType() }")
-                            .build()
+        if (!this.classInfo.isOpen)
+            return
+
+        typeBuilder.addType(
+            TypeSpec.companionObjectBuilder()
+                .addProperty(
+                    PropertySpec.builder(
+                        "otherSubclasses",
+                        Map::class.asTypeName()
+                            .plusParameter(Class::class.asClassName().parameterizedBy(STAR))
+                            .plusParameter(this.classInfo.interfaceType),
+                        KModifier.PRIVATE
                     )
-                    .addProperty(
-                        PropertySpec.builder(
-                            "subclassPackerNames",
-                            ClassName("kotlin.collections", "Map")
-                                .plusParameter(String::class.asTypeName())
-                                .plusParameter(this.classInfo.interfaceType),
-                            KModifier.PRIVATE
-                        )
-                            .initializer("otherSubclasses.values.associateBy·{ it.typeName() }")
-                            .build()
-                    )
+                    .initializer("java.util.ServiceLoader.load(I${classInfo.name}_Packer::class.java).associateBy { it.objType() }")
                     .build()
-            )
-        }
+                )
+                .addProperty(
+                    PropertySpec.builder(
+                        "subclassPackerNames",
+                        ClassName("kotlin.collections", "Map")
+                            .plusParameter(String::class.asTypeName())
+                            .plusParameter(this.classInfo.interfaceType),
+                        KModifier.PRIVATE
+                    )
+                    .initializer("otherSubclasses.values.associateBy·{ it.typeName() }")
+                    .build()
+                )
+                .build()
+        )
     }
 }

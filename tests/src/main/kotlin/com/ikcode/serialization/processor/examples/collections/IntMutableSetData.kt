@@ -10,10 +10,7 @@ class IntMutableSetData(
     @SerializationData val nullableNullC: MutableSet<Int>?,
     @SerializationData val nullableValueC: MutableSet<Int>?,
 ) {
-    @SerializationData
-    var mutable: MutableSet<Int> = hashSetOf()
-    @SerializationData
-    var nullableNull: MutableSet<Int>? = hashSetOf()
-    @SerializationData
-    var nullableValue: MutableSet<Int>? = hashSetOf()
+    @SerializationData var mutable: MutableSet<Int> = hashSetOf()
+    @SerializationData var nullableNull: MutableSet<Int>? = hashSetOf()
+    @SerializationData var nullableValue: MutableSet<Int>? = hashSetOf()
 }

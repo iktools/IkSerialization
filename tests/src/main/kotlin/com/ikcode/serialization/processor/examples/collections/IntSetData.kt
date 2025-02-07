@@ -10,10 +10,7 @@ class IntSetData(
     @SerializationData val nullableNullC: Set<Int>?,
     @SerializationData val nullableValueC: Set<Int>?,
 ) {
-    @SerializationData
-    var mutable: Set<Int> = setOf()
-    @SerializationData
-    var nullableNull: Set<Int>? = setOf()
-    @SerializationData
-    var nullableValue: Set<Int>? = setOf()
+    @SerializationData var mutable: Set<Int> = setOf()
+    @SerializationData var nullableNull: Set<Int>? = setOf()
+    @SerializationData var nullableValue: Set<Int>? = setOf()
 }
