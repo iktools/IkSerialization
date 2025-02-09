@@ -1,4 +1,7 @@
 # IkSerialization
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/subchannel13/IkSerialization/test.yml)
+![GitHub Sponsors](https://img.shields.io/github/sponsors/subchannel13)
+
 Serialization library that handles circular references and cross module polymorphism with just annotations.
 ```
 @SerializableClass
