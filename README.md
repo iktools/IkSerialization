@@ -3,7 +3,7 @@
 ![GitHub Sponsors](https://img.shields.io/github/sponsors/subchannel13)
 
 Serialization library that handles circular references and cross module polymorphism with just annotations.
-```
+```Kotlin
 @SerializableClass
 abstract class BaseClass(
     @SerializationData val foo: String
@@ -32,7 +32,7 @@ Additionally serialization and deserialization work in two stages
 
 Serialization works in two stages: packing and serialization proper. Packing stage converts concrete objects to generic maps and lists that can then be serialized to a format of choice.
 
-```
+```Kotlin
 // Object to serialize
 val obj = ObjectSample(10)
 
@@ -52,7 +52,7 @@ session.referencedData.forEach {
 To start serialization you need a fresh instance of `PackingSession` and call `pack` on and an appropriate packer class (generated for `@SerializableClass` annotated class). This will populate the packing session and return the reference of the "root" object. Then you can use those data to create output in the format of choice. This does move require from library user to write that final piece of logic, but that is not as complex as it sounds. Here is an example of `serializationMapper` function for converting packed objects to JSON for Android:
 
 
-```
+```Kotlin
 fun serializationMapper(obj: Any, path: String = ""): Any = when(obj) {
     is Map<*, *> -> JSONArray().apply {
         put("map")
