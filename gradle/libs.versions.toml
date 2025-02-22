@@ -3,8 +3,8 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.0.21"
-kspVersion = "2.0.21-1.0.28"
+kotlin = "1.9.0"
+kspVersion = "1.9.0-1.0.13"
 kotlinpoetVersion = "2.0.0"
 
 [libraries]
