@@ -5,28 +5,51 @@
 Serialization library that handles circular references and cross module polymorphism with just annotations.
 ```Kotlin
 @SerializableClass
-abstract class BaseClass(
-    @SerializationData val foo: String
+abstract class ANode(
+    @SerializationData
+    val address: String
 )
 
 @SerializableClass
-class DerivedClass(
-    foo: String,
-    @SerializationData val bar: String
-): BaseClass(foo)
+class Server(address: String) : ANode(address) {
+    @SerializationData 
+    val clients = mutableListOf<ANode>()
+}
+
+@SerializableClass
+class Client(
+    address: String,
+    @SerializationData 
+    val server: Server
+) : ANode(address)
+
+// Object creation and initialization
+val server = Server("192.168.0.100")
+server.clients += Client("192.168.0.101", server)
+
+// Server object serialization
+val session = PackingSession()
+val serialized = Server_Packer().pack(server, session)
 ```
 
 # How?
 
 The library provides KSP based compiler plugin that scans for `@SerializableClass` and `@SerializationData` annotations and generates serialization code tailor-made for the annotated classes and properties.
 
-In a way, the objects are not serialized by reference rather than value. Each object gets assigned a name (anchor) and those name are used in place of object references. This allows not only to serialize objects with circular references but to also fully restore object relations after deserialization (no object duplication in deserialization if two objects used to reference the same third object). As a consequence serializations results with a list of objects, not just one object.
+In a way, the objects are serialized by reference rather than value. Each object gets assigned a name (anchor) and those name are used in place of object references. This allows not only to serialize objects with circular references but to also fully restore object relations after deserialization (no object duplication in deserialization if two objects used to reference the same third object). As a consequence serializations results with a list of objects, not just one object.
 
 Internally deserialization works in two steps to in order restore original object relationships. First objects get instantiated with a minimum of data required to call their constructors and then they get hydrated with the rest of data.
 
+# Installation
 
-Additionally serialization and deserialization work in two stages
- Packing stage will generate
+This library is not yet published to any package manager so the usage involves local installation.
+
+* Download this source code
+* Execute `publishToMavenLocal` task (`gradlew publishToMavenLocal`)
+* In your project ensure you have `mavenLocal()` in the list of repositories for dependency management
+* Ensure your project is using KSP plugin version `1.9.0-1.0.13` or higher
+* Add `implementation(com.ikcode.serialization:core:0.1)` library dependency
+* Add `ksp(com.ikcode.serialization:processor:0.1)` KSP library dependency
 
 # Examlpe
 
@@ -49,7 +72,7 @@ session.referencedData.forEach {
 }
 ```
 
-To start serialization you need a fresh instance of `PackingSession` and call `pack` on and an appropriate packer class (generated for `@SerializableClass` annotated class). This will populate the packing session and return the reference of the "root" object. Then you can use those data to create output in the format of choice. This does move require from library user to write that final piece of logic, but that is not as complex as it sounds. Here is an example of `serializationMapper` function for converting packed objects to JSON for Android:
+To start serialization you need a fresh instance of `PackingSession` and call `pack` on an appropriate packer class (generated for `@SerializableClass` annotated class). This will populate the packing session and return the reference of the "root" object. Then you can use those data to create output in the format of choice. This requires from the library user to write that final piece of logic, but that is not as complex as it sounds. Here is an example of `serializationMapper` function for converting packed objects to JSON for Android:
 
 
 ```Kotlin
