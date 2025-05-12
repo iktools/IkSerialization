@@ -8,7 +8,7 @@ import com.google.devtools.ksp.symbol.KSTypeAlias
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.squareup.kotlinpoet.ksp.toTypeName
 
-class SuperclassInfo(type: KSType) {
+class SuperclassInfo(val type: KSType) {
     val declaration = when (val superDeclaration = type.declaration) {
         is KSTypeAlias -> superDeclaration.findActualType()
         else -> superDeclaration

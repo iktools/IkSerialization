@@ -19,6 +19,7 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     val name = declaration.simpleName.asString()
     val kpType = declaration.toClassName()
     val justType = declaration.asStarProjectedType()
+    val file = declaration.containingFile!!
 
     val isEnum = declaration.classKind == ClassKind.ENUM_CLASS
     val isAbstract = Modifier.ABSTRACT in declaration.modifiers || declaration.classKind == ClassKind.INTERFACE

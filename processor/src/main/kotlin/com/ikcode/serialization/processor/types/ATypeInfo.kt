@@ -4,7 +4,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.ksp.toTypeName
 
-abstract class ATypeInfo(ksType: KSType) {
+abstract class ATypeInfo(val ksType: KSType) {
     val name = ksType.declaration.simpleName.asString()
     val isNullable = ksType.isMarkedNullable
     val kpType = ksType.makeNotNullable().toTypeName()

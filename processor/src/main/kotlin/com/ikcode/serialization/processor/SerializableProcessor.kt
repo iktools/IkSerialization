@@ -35,7 +35,6 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
             info.justType to info
         }
 
-        val allSourceFiles = resolver.getAllFiles().toList().toTypedArray()
         packers.values.forEach { packer ->
             val fileText = when {
                 packer.isEnum -> EnumBuilder(packer)
@@ -44,28 +43,43 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
                 else -> StandardBuilder(packer)
             }.file()
 
-            write(packer.namespace, packer.outFileName, fileText, allSourceFiles)
+            val otherDependencies = packer.superclasses.filter {
+                it.isOpen
+            }.mapNotNull {
+                packers[it.type]
+            }.toMutableSet()
 
             if (packer.isAbstract) {
                 val interfaceFileText = InterfaceBuilder(packer).file()
-                write(packer.namespace, packer.interfaceFileName, interfaceFileText, allSourceFiles)
+                write(packer.namespace, packer.interfaceFileName, interfaceFileText, Dependencies(false, packer.file))
+                otherDependencies += packer.subclasses.mapNotNull { packers[it.ksType] }
             }
+
+            write(
+                packer.namespace,
+                packer.outFileName,
+                fileText,
+                Dependencies(
+                    packer.isAbstract,
+                    *((otherDependencies + packer).map { it.file }.toTypedArray())
+                )
+            )
         }
 
         packers.values.flatMap { packer ->
             packer.superclasses.filter { it.isOpen }.map { it to packer }
-        }.groupBy {
-            it.first
-        }.forEach { (service, implementations) ->
-            environment.codeGenerator.createNewFile(
-                Dependencies.ALL_FILES,
-                "",
+        }.groupBy(
+            { it.first },
+            { it.second }
+        ).forEach { (service, implementations) ->
+            environment.codeGenerator.createNewFileByPath(
+                Dependencies(true, *implementations.map { it.file }.toTypedArray()),
                 "META-INF/services/${service.namespace}.I${service.name}_Packer", //TODO
                 ""
             ).apply {
                 bufferedWriter().use { writer ->
                     implementations.forEach {
-                        writer.write("${it.second.namespace}.${it.second.name}_Packer")
+                        writer.write("${it.namespace}.${it.name}_Packer")
                         writer.newLine()
                     }
                 }
@@ -76,9 +90,9 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
         return symbols.filterNot { it.validate() }.toList()
     }
 
-    private fun write(namespace: String, fileName: String, fileText: FileSpec, dependencies: Array<KSFile>) {
+    private fun write(namespace: String, fileName: String, fileText: FileSpec, dependencies: Dependencies) {
         environment.codeGenerator.createNewFile(
-            dependencies = Dependencies.ALL_FILES,
+            dependencies = dependencies,
             packageName = namespace,
             fileName = fileName
         ).apply {
