@@ -4,7 +4,6 @@ import com.google.devtools.ksp.*
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSFile
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.processor.builders.AbstractBuilder
 import com.ikcode.serialization.processor.builders.EnumBuilder
@@ -18,6 +17,8 @@ import com.squareup.kotlinpoet.FileSpec
 lateinit var logger: KSPLogger
 
 class SerializableProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
+    private val services = mutableMapOf<SuperclassInfo, MutableList<PackerInfo>>()
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver
             .getSymbolsWithAnnotation(SerializableClass::class.java.canonicalName)
@@ -66,12 +67,22 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
             )
         }
 
-        packers.values.flatMap { packer ->
-            packer.superclasses.filter { it.isOpen }.map { it to packer }
-        }.groupBy(
-            { it.first },
-            { it.second }
-        ).forEach { (service, implementations) ->
+        packers.values.forEach { packer ->
+            packer.superclasses.filter {
+                it.isOpen
+            }.forEach {
+                this.services.computeIfAbsent(it) {
+                    mutableListOf()
+                }.add(packer)
+            }
+        }
+
+        return symbols.filterNot { it.validate() }.toList()
+    }
+
+    override fun finish() {
+        this.services.forEach { (service, implementations) ->
+            logger.warn("Generating META-INF/services/${service.namespace}.I${service.name}_Packer for ${implementations.joinToString { "${it.namespace}.${it.name}" }}")
             environment.codeGenerator.createNewFileByPath(
                 Dependencies(true, *implementations.map { it.file }.toTypedArray()),
                 "META-INF/services/${service.namespace}.I${service.name}_Packer", //TODO
@@ -86,8 +97,6 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
                 close()
             }
         }
-
-        return symbols.filterNot { it.validate() }.toList()
     }
 
     private fun write(namespace: String, fileName: String, fileText: FileSpec, dependencies: Dependencies) {
