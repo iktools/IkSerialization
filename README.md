@@ -38,7 +38,7 @@ The library provides KSP based compiler plugin that scans for `@SerializableClas
 
 In a way, the objects are serialized by reference rather than value. Each object gets assigned a name (anchor) and those name are used in place of object references. This allows not only to serialize objects with circular references but to also fully restore object relations after deserialization (no object duplication in deserialization if two objects used to reference the same third object). As a consequence serializations results with a list of objects, not just one object.
 
-Internally deserialization works in two steps to in order restore original object relationships. First objects get instantiated with a minimum of data required to call their constructors and then they get hydrated with the rest of data.
+Internally deserialization works in two steps to in order restore original object relationships. First objects get instantiated with a minimum of data required to call their constructors, and then they get hydrated with the rest of data.
 
 # Installation
 
@@ -48,10 +48,10 @@ This library is not yet published to any package manager so the usage involves l
 * Execute `publishToMavenLocal` task (`gradlew publishToMavenLocal`)
 * In your project ensure you have `mavenLocal()` in the list of repositories for dependency management
 * Ensure your project is using KSP plugin version `1.9.0-1.0.13` or higher
-* Add `implementation(com.ikcode.serialization:core:0.1)` library dependency
-* Add `ksp(com.ikcode.serialization:processor:0.1)` KSP library dependency
+* Add `implementation('com.ikcode.serialization:core:0.1')` library dependency
+* Add `ksp('com.ikcode.serialization:processor:0.1')` KSP library dependency
 
-# Examlpe
+# Example
 
 Serialization works in two stages: packing and serialization proper. Packing stage converts concrete objects to generic maps and lists that can then be serialized to a format of choice.
 
