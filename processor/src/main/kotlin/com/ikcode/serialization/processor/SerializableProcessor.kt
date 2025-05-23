@@ -82,7 +82,6 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
 
     override fun finish() {
         this.services.forEach { (service, implementations) ->
-            logger.warn("Generating META-INF/services/${service.namespace}.I${service.name}_Packer for ${implementations.joinToString { "${it.namespace}.${it.name}" }}")
             environment.codeGenerator.createNewFileByPath(
                 Dependencies(true, *implementations.map { it.file }.toTypedArray()),
                 "META-INF/services/${service.namespace}.I${service.name}_Packer", //TODO

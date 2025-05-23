@@ -56,6 +56,8 @@ class MapTypeInfo(
             code.beginControlFlow("$destination.forEach { item ->")
             if (this.keyType.fillable)
                 this.keyType.fill(code, "", "item.key", false)
+            if (this.keyType.fillable && this.valueType.fillable)
+                code.add("\n")
             if (this.valueType.fillable)
                 this.valueType.fill(code, "", "item.value", false)
             code.endControlFlow()

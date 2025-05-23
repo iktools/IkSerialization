@@ -194,4 +194,52 @@ class SimpleMapTests {
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
+
+    @Test
+    fun objectObjectMapTests() {
+        val map1 = mapOf(ObjectSample(10) to ObjectSample(1))
+        val map2 = mapOf(ObjectSample(20) to ObjectSample(2))
+        val map3 = mapOf(ObjectSample(30) to ObjectSample(3))
+        val map4 = mapOf(ObjectSample(40) to ObjectSample(4))
+        val map5 = mapOf(ObjectSample(50) to ObjectSample(5))
+        val data = ObjectObjectMapData(map1, map2, null, map3).apply {
+            mutable = map4
+            nullableNull = null
+            nullableValue = map5
+        }
+        val session = PackingSession()
+        val pointer = ObjectObjectMapData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        val reference1k = (packed["readonlyC"] as Map<*, *>).keys.first() as ReferencePointer
+        val reference2k = (packed["mutableC"] as Map<*, *>).keys.first() as ReferencePointer
+        val reference3k = (packed["nullableValueC"] as Map<*, *>).keys.first() as ReferencePointer
+        val reference4k = (packed["mutable"] as Map<*, *>).keys.first() as ReferencePointer
+        val reference5k = (packed["nullableValue"] as Map<*, *>).keys.first() as ReferencePointer
+        val reference1v = (packed["readonlyC"] as Map<*, *>).values.first() as ReferencePointer
+        val reference2v = (packed["mutableC"] as Map<*, *>).values.first() as ReferencePointer
+        val reference3v = (packed["nullableValueC"] as Map<*, *>).values.first() as ReferencePointer
+        val reference4v = (packed["mutable"] as Map<*, *>).values.first() as ReferencePointer
+        val reference5v = (packed["nullableValue"] as Map<*, *>).values.first() as ReferencePointer
+        assertEquals(mapOf(reference1k to reference1v), packed["readonlyC"])
+        assertEquals(mapOf(reference2k to reference2v), packed["mutableC"])
+        assertEquals(mapOf(reference3k to reference3v), packed["nullableValueC"])
+        assertEquals(mapOf(reference4k to reference4v), packed["mutable"])
+        assertEquals(mapOf(reference5k to reference5v), packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = ObjectObjectMapData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(map1, unpacked.readonlyC)
+        assertEquals(map2, unpacked.mutableC)
+        assertEquals(map3, unpacked.nullableValueC)
+        assertEquals(map4, unpacked.mutable)
+        assertEquals(map5, unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
 }
