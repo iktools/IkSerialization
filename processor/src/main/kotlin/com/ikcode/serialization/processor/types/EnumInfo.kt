@@ -7,7 +7,7 @@ class EnumInfo(ksType: KSType): ATypeInfo(ksType) {
     override val fillable get() = false
 
     override fun instantiate(code: CodeBlock.Builder, data: String) {
-        code.add("${this.name}.entries[$data as Int]")
+        code.add("%T.entries[$data as Int]", this.kpType)
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
