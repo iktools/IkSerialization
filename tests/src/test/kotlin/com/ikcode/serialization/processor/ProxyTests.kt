@@ -1,11 +1,9 @@
 package com.ikcode.serialization.processor
 
+import com.ikcode.serialization.core.references.ReferencePointer
 import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
-import com.ikcode.serialization.processor.examples.proxy.ListProxyData
-import com.ikcode.serialization.processor.examples.proxy.ListProxyData_Packer
-import com.ikcode.serialization.processor.examples.proxy.MapProxyData
-import com.ikcode.serialization.processor.examples.proxy.MapProxyData_Packer
+import com.ikcode.serialization.processor.examples.proxy.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -38,5 +36,19 @@ class ProxyTests {
 
         assertEquals(1, unpacked.item1)
         assertEquals(2, unpacked.item2)
+    }
+
+    @Test
+    fun listProxyUserTest() {
+        val data = ListProxyUser(GenericListProxy<Int>(1))
+        val session = PackingSession()
+        val pointer = ListProxyUser_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(listOf(1), packed["intData"])
+
+        val unpacked = ListProxyUser_Packer().unpack(pointer, UnpackingSession(session.referencedData))
+
+        assertEquals(1, unpacked.intData.item)
     }
 }

@@ -4,10 +4,7 @@ import com.google.devtools.ksp.findActualType
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.processing.Resolver
-import com.google.devtools.ksp.symbol.ClassKind
-import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.symbol.KSTypeAlias
+import com.google.devtools.ksp.symbol.*
 import com.ikcode.serialization.core.session.IProxyPacked
 
 class TypeUtil(
@@ -62,6 +59,21 @@ class TypeUtil(
                 this
             )
             this.pairType == justType -> ClassAsListInfo(type, classDeclaration!!, this)
+            this.proxyType.isAssignableFrom(justType) -> ProxyTypeInfo(
+                type,
+                get(classDeclaration!!.superTypes.map {
+                    it.resolve()
+                } .first {
+                    this.proxyType.isAssignableFrom(it)
+                }.let {
+                    substituteGenerics(
+                        it.arguments[0].type!!.resolve(),
+                        classDeclaration.typeParameters.zip(type.arguments).associate { (arg, argType) ->
+                            arg.name.getShortName() to argType
+                        }
+                    )
+                })
+            )
             else -> ClassInfo(type)
         }
     }
@@ -70,5 +82,11 @@ class TypeUtil(
         private inline fun <reified T> starType(resolver: Resolver) = resolver
             .getClassDeclarationByName<T>()!!
             .asStarProjectedType()
+
+        private fun substituteGenerics(type: KSType, substitutionMap: Map<String, KSTypeArgument>): KSType {
+            return (type.declaration as KSClassDeclaration).asType(type.arguments.map {
+                substitutionMap[it.type?.resolve()?.declaration?.simpleName?.getShortName()] ?: it
+            })
+        }
     }
 }

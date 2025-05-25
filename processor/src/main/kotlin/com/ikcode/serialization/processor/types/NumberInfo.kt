@@ -18,6 +18,6 @@ class NumberInfo(ksType: KSType): ATypeInfo(ksType) {
         if (!instantiate)
             throw IllegalArgumentException("Number can't be filled")
 
-        code.add("($data as Number).to${this.name}()")
+        this.instantiate(code, data)
     }
 }
