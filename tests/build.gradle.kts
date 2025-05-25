@@ -1,6 +1,14 @@
 plugins {
-    id("buildsrc.convention.kotlin-jvm")
+    kotlin("jvm")
     alias(libs.plugins.ksp)
+}
+
+kotlin {
+    jvmToolchain(8)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 dependencies {
