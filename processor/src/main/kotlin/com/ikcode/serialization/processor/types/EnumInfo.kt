@@ -7,7 +7,7 @@ class EnumInfo(ksType: KSType): ATypeInfo(ksType) {
     override val fillable get() = false
 
     override fun instantiate(code: CodeBlock.Builder, data: String) {
-        code.add("%T.entries[$data as Int]", this.kpType)
+        code.add("%T.entries[($data as Number).toInt()]", this.kpType)
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
@@ -18,6 +18,6 @@ class EnumInfo(ksType: KSType): ATypeInfo(ksType) {
         if (!instantiate)
             throw IllegalArgumentException("Number can't be filled")
 
-        code.add("%T.values()[$data as Int]", this.kpType)
+        this.instantiate(code, data)
     }
 }
