@@ -121,10 +121,16 @@ class SimpleMapTests {
 
     @Test
     fun intMutableMapTests() {
-        val data = IntMutableMapData(hashMapOf(1 to 10), hashMapOf(2 to 20), null, hashMapOf(3 to 30)).apply {
+        val data = IntMutableMapData(
+            hashMapOf(1 to 10),
+            hashMapOf(2 to 20),
+            null,
+            hashMapOf(3 to 30)
+        ).apply {
             mutable = hashMapOf(4 to 40)
             nullableNull = null
             nullableValue = hashMapOf(5 to 50)
+            readonly[6] = 60
         }
         val session = PackingSession()
         val pointer = IntMutableMapData_Packer().pack(data, session) as ReferencePointer
@@ -135,6 +141,7 @@ class SimpleMapTests {
         assertEquals(mapOf(3 to 30), packed["nullableValueC"])
         assertEquals(mapOf(4 to 40), packed["mutable"])
         assertEquals(mapOf(5 to 50), packed["nullableValue"])
+        assertEquals(mapOf(6 to 60), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -148,6 +155,7 @@ class SimpleMapTests {
         assertEquals(hashMapOf(3 to 30), unpacked.nullableValueC)
         assertEquals(hashMapOf(4 to 40), unpacked.mutable)
         assertEquals(hashMapOf(5 to 50), unpacked.nullableValue)
+        assertEquals(hashMapOf(6 to 60), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }

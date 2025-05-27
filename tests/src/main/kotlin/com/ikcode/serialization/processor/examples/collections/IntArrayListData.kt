@@ -13,4 +13,5 @@ class IntArrayListData(
     @SerializationData var mutable = arrayListOf<Int>()
     @SerializationData var nullableNull: ArrayList<Int>? = arrayListOf()
     @SerializationData var nullableValue: ArrayList<Int>? = arrayListOf()
+    @SerializationData val readonly = arrayListOf<Int>()
 }

@@ -28,11 +28,11 @@ class ListTests {
             arrayListOf(2),
             null,
             arrayListOf(3)
-        )
-            .apply {
+        ).apply {
             mutable = arrayListOf(4)
             nullableNull = null
             nullableValue = arrayListOf(5)
+            readonly.add(6)
         }
         val session = PackingSession()
         val pointer = IntArrayListData_Packer().pack(data, session) as ReferencePointer
@@ -43,6 +43,7 @@ class ListTests {
         assertEquals(listOf(3), packed["nullableValueC"])
         assertEquals(listOf(4), packed["mutable"])
         assertEquals(listOf(5), packed["nullableValue"])
+        assertEquals(listOf(6), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -56,6 +57,7 @@ class ListTests {
         assertEquals(arrayListOf(3), unpacked.nullableValueC)
         assertEquals(arrayListOf(4), unpacked.mutable)
         assertEquals(arrayListOf(5), unpacked.nullableValue)
+        assertEquals(arrayListOf(6), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
