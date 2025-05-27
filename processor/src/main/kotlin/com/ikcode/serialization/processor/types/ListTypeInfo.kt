@@ -31,7 +31,7 @@ class ListTypeInfo(
         this.argument.pack(code, "it")
         code.endControlFlow()
 
-        code.add(".toList()\n")
+        code.add(".toList()")
     }
 
     override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {

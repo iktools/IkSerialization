@@ -35,7 +35,7 @@ class MapTypeInfo(
         this.valueType.pack(code, "it.value!!")
         code.endControlFlow()
 
-        code.add(".toMap()\n")
+        code.add(".toMap()")
     }
 
     override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {
