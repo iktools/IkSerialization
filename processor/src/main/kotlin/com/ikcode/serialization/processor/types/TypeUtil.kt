@@ -26,10 +26,10 @@ class TypeUtil(
     private val primitives = numbers + resolver.builtIns.booleanType + resolver.builtIns.stringType + resolver.builtIns.charType
 
     private val iterableType = starType<Iterable<*>>(resolver)
-    private val mutableIterableType = resolver.getClassDeclarationByName("kotlin.collections.MutableIterable")!!.asStarProjectedType()
+    private val mutableIterableType = starType(resolver, "kotlin.collections.MutableIterable")
     private val setType = starType<Set<*>>(resolver)
     private val mapType = starType<Map<*, *>>(resolver)
-    private val mutableMapType = starType<MutableMap<*, *>>(resolver)
+    private val mutableMapType = starType(resolver, "kotlin.collections.MutableMap")
     private val pairType = starType<Pair<*, *>>(resolver)
 
     operator fun get(type: KSType): ATypeInfo {
@@ -81,6 +81,10 @@ class TypeUtil(
     companion object {
         private inline fun <reified T> starType(resolver: Resolver) = resolver
             .getClassDeclarationByName<T>()!!
+            .asStarProjectedType()
+
+        private fun starType(resolver: Resolver, typeName: String) = resolver
+            .getClassDeclarationByName(typeName)!!
             .asStarProjectedType()
 
         private fun substituteGenerics(type: KSType, substitutionMap: Map<String, KSTypeArgument>): KSType {

@@ -14,18 +14,25 @@ class MapTypeInfo(
     private val valueType = types[ksType.arguments[1].type!!.resolve()]
 
     override fun instantiate(code: CodeBlock.Builder, data: String) {
-        if (this.concrete)
-            code.beginControlFlow("%T(($data as Map<*, *>).map", this.kpType)
-        else
-            code.beginControlFlow("($data as Map<*, *>).map", this.kpType)
+        if (this.mutable)
+            if (this.concrete)
+                code.add("%T()", this.kpType)
+            else
+                code.add("mutableMapOf()")
+        else {
+            if (this.concrete)
+                code.beginControlFlow("%T(($data as Map<*, *>).map", this.kpType)
+            else
+                code.beginControlFlow("($data as Map<*, *>).map", this.kpType)
 
-        this.keyType.instantiate(code, "it.key!!")
-        code.add(" to ")
-        this.valueType.instantiate(code, "it.value!!")
-        code.add("\n")
-        code.endControlFlow()
+            this.keyType.instantiate(code, "it.key!!")
+            code.add(" to ")
+            this.valueType.instantiate(code, "it.value!!")
+            code.add("\n")
+            code.endControlFlow()
 
-        this.collector(code)
+            this.collector(code)
+        }
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
@@ -50,6 +57,13 @@ class MapTypeInfo(
             code.endControlFlow()
 
             this.collector(code)
+        } else if (this.mutable) {
+            code.beginControlFlow("($data as Map<*, *>).forEach { itemData ->")
+            code.add("$destination[")
+            this.keyType.instantiate(code, "itemData.key!!")
+            code.add("] = ")
+            this.valueType.instantiate(code, "itemData.value!!")
+            code.endControlFlow()
         }
 
         if (this.keyType.fillable || this.valueType.fillable) {
