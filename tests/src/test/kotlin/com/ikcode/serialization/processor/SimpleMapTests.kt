@@ -210,6 +210,7 @@ class SimpleMapTests {
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
+
     @Test
     fun objectIntMutableMapTests() {
         val map1 = mutableMapOf(ObjectSample(10) to 1)
