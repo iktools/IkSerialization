@@ -13,4 +13,5 @@ class IntHashMapData(
     @SerializationData var mutable: HashMap<Int, Int> = hashMapOf()
     @SerializationData var nullableNull: HashMap<Int, Int>? = hashMapOf()
     @SerializationData var nullableValue: HashMap<Int, Int>? = hashMapOf()
+    @SerializationData val readonly = hashMapOf<Int, Int>()
 }

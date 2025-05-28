@@ -71,6 +71,21 @@ class StandardBuilder(
             code.add(")\n")
             funBuilder.addCode(code.build())
         }
+
+        /*classInfo.allProperties.filter { property ->
+            !property.isMutable && property.type.fillable && classInfo.constructorParams.all {
+                it.name != property.ksName
+            }
+        }.forEach { property ->
+            if (property.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
+
+            funBuilder.addStatement("session.rememberInstance(obj.${property.name}, (objData[\"${property.name}\"] as %T).name)", ReferencePointer::class)
+
+            if (property.type.isNullable)
+                funBuilder.endControlFlow()
+        }*/
+
         funBuilder.addStatement("session.rememberInstance(obj, name)")
         funBuilder.addStatement("return obj")
     }
@@ -106,7 +121,6 @@ class StandardBuilder(
                 if (!field.inConstructor)
                     funBuilder.addStatement("else obj.${field.name} = null")
             }
-
         }
     }
 

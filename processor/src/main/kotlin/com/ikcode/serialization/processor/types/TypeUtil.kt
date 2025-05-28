@@ -26,7 +26,7 @@ class TypeUtil(
     private val primitives = numbers + resolver.builtIns.booleanType + resolver.builtIns.stringType + resolver.builtIns.charType
 
     private val iterableType = starType<Iterable<*>>(resolver)
-    private val mutableIterableType = starType<MutableIterable<*>>(resolver)
+    private val mutableIterableType = resolver.getClassDeclarationByName("kotlin.collections.MutableIterable")!!.asStarProjectedType()
     private val setType = starType<Set<*>>(resolver)
     private val mapType = starType<Map<*, *>>(resolver)
     private val mutableMapType = starType<MutableMap<*, *>>(resolver)

@@ -14,16 +14,24 @@ class ListTypeInfo(
     private val argument = types[ksType.arguments[0].type!!.resolve()]
 
     override fun instantiate(code: CodeBlock.Builder, data: String) {
-        if (this.concrete)
-            code.beginControlFlow("%T(($data as Collection<*>).map", this.kpType)
-        else
-            code.beginControlFlow("($data as Collection<*>).map", this.kpType)
+        if (this.mutable)
+            when {
+                this.concrete -> code.add("%T()", this.kpType)
+                this.isSet -> code.add("mutableSetOf<%T>()", this.argument.kpType)
+                else -> code.add("mutableListOf<%T>()", this.argument.kpType)
+            }
+        else {
+            if (this.concrete)
+                code.beginControlFlow("%T(($data as Collection<*>).map", this.kpType)
+            else
+                code.beginControlFlow("($data as Collection<*>).map", this.kpType)
 
-        this.argument.instantiate(code, "it!!")
-        code.add("\n")
-        code.endControlFlow()
+            this.argument.instantiate(code, "it!!")
+            code.add("\n")
+            code.endControlFlow()
 
-        this.collector(code)
+            this.collector(code)
+        }
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {
@@ -44,6 +52,11 @@ class ListTypeInfo(
             code.endControlFlow()
 
             this.collector(code)
+        } else if (this.mutable) {
+            code.beginControlFlow("($data as List<*>).forEach { itemData ->")
+            code.add("$destination += ")
+            this.argument.instantiate(code, "itemData!!")
+            code.endControlFlow()
         }
 
         if (this.argument.fillable) {

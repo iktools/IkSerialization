@@ -13,4 +13,5 @@ class IntHashSetData(
     @SerializationData var mutable: HashSet<Int> = hashSetOf()
     @SerializationData var nullableNull: HashSet<Int>? = hashSetOf()
     @SerializationData var nullableValue: HashSet<Int>? = hashSetOf()
+    @SerializationData val readonly = hashSetOf<Int>()
 }

@@ -13,4 +13,5 @@ class IntMapNestedValueData(
     @SerializationData var mutable: MutableList<Map<Int, Int>> = mutableListOf()
     @SerializationData var nullableNull: MutableList<Map<Int, Int>>? = mutableListOf()
     @SerializationData var nullableValue: MutableList<Map<Int, Int>>? = mutableListOf()
+    @SerializationData val readonly = mutableListOf<Map<Int, Int>>()
 }

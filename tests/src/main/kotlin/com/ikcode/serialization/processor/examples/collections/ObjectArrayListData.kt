@@ -14,4 +14,5 @@ class ObjectArrayListData(
     @SerializationData var mutable = arrayListOf<ObjectSample>()
     @SerializationData var nullableNull: ArrayList<ObjectSample>? = arrayListOf()
     @SerializationData var nullableValue: ArrayList<ObjectSample>? = arrayListOf()
+    @SerializationData val readonly = arrayListOf<ObjectSample>()
 }

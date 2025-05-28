@@ -25,6 +25,7 @@ class SimpleSetTests {
             mutable = hashSetOf(4)
             nullableNull = null
             nullableValue = hashSetOf(5)
+            readonly += 6
         }
         val session = PackingSession()
         val pointer = IntHashSetData_Packer().pack(data, session) as ReferencePointer
@@ -35,6 +36,7 @@ class SimpleSetTests {
         assertEquals(listOf(3), packed["nullableValueC"])
         assertEquals(listOf(4), packed["mutable"])
         assertEquals(listOf(5), packed["nullableValue"])
+        assertEquals(listOf(6), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -48,6 +50,7 @@ class SimpleSetTests {
         assertEquals(hashSetOf(3), unpacked.nullableValueC)
         assertEquals(hashSetOf(4), unpacked.mutable)
         assertEquals(hashSetOf(5), unpacked.nullableValue)
+        assertEquals(hashSetOf(6), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
@@ -63,6 +66,7 @@ class SimpleSetTests {
             mutable = mutableSetOf(4)
             nullableNull = null
             nullableValue = mutableSetOf(5)
+            readonly += 6
         }
         val session = PackingSession()
         val pointer = IntMutableSetData_Packer().pack(data, session) as ReferencePointer
@@ -73,10 +77,11 @@ class SimpleSetTests {
         assertEquals(listOf(3), packed["nullableValueC"])
         assertEquals(listOf(4), packed["mutable"])
         assertEquals(listOf(5), packed["nullableValue"])
+        assertEquals(listOf(6), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
-        val unpacked = IntSetData_Packer().unpack(
+        val unpacked = IntMutableSetData_Packer().unpack(
             pointer,
             UnpackingSession(session.referencedData)
         )
@@ -86,6 +91,7 @@ class SimpleSetTests {
         assertEquals(mutableSetOf(3), unpacked.nullableValueC)
         assertEquals(mutableSetOf(4), unpacked.mutable)
         assertEquals(mutableSetOf(5), unpacked.nullableValue)
+        assertEquals(mutableSetOf(6), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }

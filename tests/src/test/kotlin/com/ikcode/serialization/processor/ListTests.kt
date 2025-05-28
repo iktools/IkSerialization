@@ -144,6 +144,7 @@ class ListTests {
             mutable = mutableListOf(mapOf(4 to 40))
             nullableNull = null
             nullableValue = mutableListOf(mapOf(5 to 50))
+            readonly += mapOf(6 to 60)
         }
         val session = PackingSession()
         val pointer = IntMapNestedValueData_Packer().pack(data, session) as ReferencePointer
@@ -154,6 +155,7 @@ class ListTests {
         assertEquals(listOf(mapOf(3 to 30)), packed["nullableValueC"])
         assertEquals(listOf(mapOf(4 to 40)), packed["mutable"])
         assertEquals(listOf(mapOf(5 to 50)), packed["nullableValue"])
+        assertEquals(listOf(mapOf(6 to 60)), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -167,6 +169,7 @@ class ListTests {
         assertEquals(listOf(hashMapOf(3 to 30)), unpacked.nullableValueC)
         assertEquals(listOf(hashMapOf(4 to 40) as Map<Int, Int>), unpacked.mutable)
         assertEquals(listOf(hashMapOf(5 to 50) as Map<Int, Int>), unpacked.nullableValue!!)
+        assertEquals(listOf(hashMapOf(6 to 60) as Map<Int, Int>), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
@@ -182,6 +185,7 @@ class ListTests {
             mutable = mutableListOf(4)
             nullableNull = null
             nullableValue = mutableListOf(5)
+            readonly += 6
         }
         val session = PackingSession()
         val pointer = IntMutableListData_Packer().pack(data, session) as ReferencePointer
@@ -192,6 +196,7 @@ class ListTests {
         assertEquals(listOf(3), packed["nullableValueC"])
         assertEquals(listOf(4), packed["mutable"])
         assertEquals(listOf(5), packed["nullableValue"])
+        assertEquals(listOf(6), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -205,6 +210,7 @@ class ListTests {
         assertEquals(arrayListOf(3), unpacked.nullableValueC)
         assertEquals(arrayListOf(4), unpacked.mutable)
         assertEquals(arrayListOf(5), unpacked.nullableValue)
+        assertEquals(arrayListOf(6), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
@@ -216,18 +222,19 @@ class ListTests {
         val referencedData3 = ObjectSample(3)
         val referencedData4 = ObjectSample(4)
         val referencedData5 = ObjectSample(5)
+        val referencedData6 = ObjectSample(6)
 
         val data = ObjectArrayListData(
             arrayListOf(referencedData1),
             arrayListOf(referencedData2),
             null,
             arrayListOf(referencedData3)
-        )
-            .apply {
-                mutable = arrayListOf(referencedData4)
-                nullableNull = null
-                nullableValue = arrayListOf(referencedData5)
-            }
+        ).apply {
+            mutable = arrayListOf(referencedData4)
+            nullableNull = null
+            nullableValue = arrayListOf(referencedData5)
+            readonly += referencedData6
+        }
         val session = PackingSession()
         val pointer = ObjectArrayListData_Packer().pack(data, session) as ReferencePointer
         val packed = session.referencedData.first { it.pointer == pointer}.dataMap
@@ -237,17 +244,20 @@ class ListTests {
         val reference3 = (packed["nullableValueC"] as List<*>)[0] as ReferencePointer
         val reference4 = (packed["mutable"] as List<*>)[0] as ReferencePointer
         val reference5 = (packed["nullableValue"] as List<*>)[0] as ReferencePointer
+        val reference6 = (packed["readonly"] as List<*>)[0] as ReferencePointer
         assert(reference1.name.startsWith("ObjectSample"))
         assert(reference2.name.startsWith("ObjectSample"))
         assert(reference3.name.startsWith("ObjectSample"))
         assert(reference4.name.startsWith("ObjectSample"))
         assert(reference5.name.startsWith("ObjectSample"))
+        assert(reference6.name.startsWith("ObjectSample"))
 
         assertEquals(listOf(reference1), packed["readonlyC"])
         assertEquals(listOf(reference2), packed["mutableC"])
         assertEquals(listOf(reference3), packed["nullableValueC"])
         assertEquals(listOf(reference4), packed["mutable"])
         assertEquals(listOf(reference5), packed["nullableValue"])
+        assertEquals(listOf(reference6), packed["readonly"])
         assert(!packed.containsKey("nullableNullC"))
         assert(!packed.containsKey("nullableNull"))
 
@@ -261,6 +271,7 @@ class ListTests {
         assertEquals(arrayListOf(ObjectSample(3)), unpacked.nullableValueC)
         assertEquals(arrayListOf(ObjectSample(4)), unpacked.mutable)
         assertEquals(arrayListOf(ObjectSample(5)), unpacked.nullableValue)
+        assertEquals(arrayListOf(ObjectSample(6)), unpacked.readonly)
         assertEquals(null, unpacked.nullableNullC)
         assertEquals(null, unpacked.nullableNull)
     }
