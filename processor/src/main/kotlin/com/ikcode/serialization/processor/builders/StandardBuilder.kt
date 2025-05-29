@@ -5,6 +5,9 @@ import com.ikcode.serialization.core.session.PackingSession
 import com.ikcode.serialization.core.session.UnpackingSession
 import com.ikcode.serialization.processor.LineBreaker
 import com.ikcode.serialization.processor.PackerInfo
+import com.ikcode.serialization.processor.types.ATypeInfo
+import com.ikcode.serialization.processor.types.ClassInfo
+import com.ikcode.serialization.processor.types.ProxyTypeInfo
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
@@ -72,19 +75,23 @@ class StandardBuilder(
             funBuilder.addCode(code.build())
         }
 
-        /*classInfo.allProperties.filter { property ->
-            !property.isMutable && property.type.fillable && classInfo.constructorParams.all {
-                it.name != property.ksName
-            }
+        classInfo.allProperties.filter { property ->
+            !property.isMutable
+                    && property.type.fillable
+                    && needsRemembering(property.type)
+                    && classInfo.constructorParams.all {
+                        it.name != property.ksName
+                    }
         }.forEach { property ->
+            funBuilder.addComment("Remember ${property.name}")
             if (property.type.isNullable)
                 funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
 
-            funBuilder.addStatement("session.rememberInstance(obj.${property.name}, (objData[\"${property.name}\"] as %T).name)", ReferencePointer::class)
+            funBuilder.addStatement("session.rememberInstance(obj.${property.name}!!, (objData[\"${property.name}\"] as %T).name)", ReferencePointer::class)
 
             if (property.type.isNullable)
                 funBuilder.endControlFlow()
-        }*/
+        }
 
         funBuilder.addStatement("session.rememberInstance(obj, name)")
         funBuilder.addStatement("return obj")
@@ -118,7 +125,7 @@ class StandardBuilder(
 
             if (field.type.isNullable) {
                 funBuilder.endControlFlow()
-                if (!field.inConstructor)
+                if (!field.inConstructor && field.isMutable)
                     funBuilder.addStatement("else obj.${field.name} = null")
             }
         }
@@ -197,5 +204,13 @@ class StandardBuilder(
 
         typeBuilder.addFunction(packOwnFunc.build())
             .addFunction(typeNameFunc.build())
+    }
+
+    companion object {
+        private fun needsRemembering(typeInfo: ATypeInfo): Boolean = when(typeInfo) {
+            is ClassInfo -> true
+            is ProxyTypeInfo -> needsRemembering(typeInfo.proxy)
+            else -> false
+        }
     }
 }
