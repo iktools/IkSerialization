@@ -27,6 +27,8 @@ class ListTypeInfo(
                 code.beginControlFlow("($data as Collection<*>).map", this.kpType)
 
             this.argument.instantiate(code, "it!!")
+            if (this.argument.fillable)
+                code.add(".also { item -> session.rememberData(item, it!!) }")
             code.add("\n")
             code.endControlFlow()
 
@@ -49,6 +51,8 @@ class ListTypeInfo(
 
             code.beginControlFlow("($data as List<*>).map { itemData ->")
             this.argument.instantiate(code, "itemData!!")
+            if (this.argument.fillable)
+                code.add(".also { item -> session.rememberData(item, itemData!!) }")
             code.endControlFlow()
 
             this.collector(code)
@@ -56,23 +60,29 @@ class ListTypeInfo(
             code.beginControlFlow("($data as List<*>).forEach { itemData ->")
             code.add("$destination += ")
             this.argument.instantiate(code, "itemData!!")
+            if (this.argument.fillable)
+                code.add(".also { item -> session.rememberData(item, itemData!!) }")
             code.endControlFlow()
         }
 
         if (this.argument.fillable) {
+            if (instantiate || this.mutable)
+                code.add("\n")
+
             code.beginControlFlow("$destination.forEach { item ->")
-            this.argument.fill(code, "", "item", false)
+            code.add("val data = session.getData(item)\n")
+            this.argument.fill(code, "data", "item", false)
             code.endControlFlow()
         }
     }
 
     private fun collector(code: CodeBlock.Builder) {
         when {
-            this.concrete -> code.add(")\n")
-            !this.isSet && this.mutable -> code.add(".toMutableList()\n")
-            !this.isSet && !this.mutable -> code.add(".toList()\n")
-            this.isSet && this.mutable -> code.add(".toMutableSet()\n")
-            else -> code.add(".toSet()\n")
+            this.concrete -> code.add(")")
+            !this.isSet && this.mutable -> code.add(".toMutableList()")
+            !this.isSet && !this.mutable -> code.add(".toList()")
+            this.isSet && this.mutable -> code.add(".toMutableSet()")
+            else -> code.add(".toSet()")
         }
     }
 }

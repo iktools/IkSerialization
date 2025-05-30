@@ -18,7 +18,7 @@ class MapTypeInfo(
             if (this.concrete)
                 code.add("%T()", this.kpType)
             else
-                code.add("mutableMapOf()")
+                code.add("mutableMapOf<%T, %T>()", this.keyType.kpType, this.valueType.kpType)
         else {
             if (this.concrete)
                 code.beginControlFlow("%T(($data as Map<*, *>).map", this.kpType)
@@ -26,8 +26,15 @@ class MapTypeInfo(
                 code.beginControlFlow("($data as Map<*, *>).map", this.kpType)
 
             this.keyType.instantiate(code, "it.key!!")
+            if (this.keyType.fillable)
+                code.add(".also { item -> session.rememberData(item, it.key!!) }")
+
             code.add(" to ")
+
             this.valueType.instantiate(code, "it.value!!")
+            if (this.valueType.fillable)
+                code.add(".also { item -> session.rememberData(item, it.value!!) }")
+
             code.add("\n")
             code.endControlFlow()
 
@@ -51,29 +58,51 @@ class MapTypeInfo(
                 code.addStatement("%T(", this.kpType)
 
             code.beginControlFlow("($data as Map<*, *>).map { itemData ->")
-            this.keyType.instantiate(code, "itemData.key!!")
-            code.add(" to ")
-            this.valueType.instantiate(code, "itemData.value!!")
-            code.endControlFlow()
 
+            this.keyType.instantiate(code, "itemData.key!!")
+            if (this.keyType.fillable)
+                code.add(".also { item -> session.rememberData(item, itemData.key!!) }")
+
+            code.add(" to ")
+
+            this.valueType.instantiate(code, "itemData.value!!")
+            if (this.valueType.fillable)
+                code.add(".also { item -> session.rememberData(item, itemData.value!!) }")
+
+            code.endControlFlow()
             this.collector(code)
         } else if (this.mutable) {
             code.beginControlFlow("($data as Map<*, *>).forEach { itemData ->")
+
             code.add("$destination[")
             this.keyType.instantiate(code, "itemData.key!!")
+            if (this.keyType.fillable)
+                code.add(".also { item -> session.rememberData(item, itemData.key!!) }")
+
             code.add("] = ")
+
             this.valueType.instantiate(code, "itemData.value!!")
+            if (this.valueType.fillable)
+                code.add(".also { item -> session.rememberData(item, itemData.value!!) }")
+
             code.endControlFlow()
         }
 
         if (this.keyType.fillable || this.valueType.fillable) {
+            if (instantiate || this.mutable)
+                code.add("\n")
+
             code.beginControlFlow("$destination.forEach { item ->")
-            if (this.keyType.fillable)
-                this.keyType.fill(code, "", "item.key", false)
+            if (this.keyType.fillable) {
+                code.add("val keyData = session.getData(item.key)\n")
+                this.keyType.fill(code, "keyData", "item.key", false)
+            }
             if (this.keyType.fillable && this.valueType.fillable)
                 code.add("\n")
-            if (this.valueType.fillable)
-                this.valueType.fill(code, "", "item.value", false)
+            if (this.valueType.fillable) {
+                code.add("val valueData = session.getData(item.value)\n")
+                this.valueType.fill(code, "valueData", "item.value", false)
+            }
             code.endControlFlow()
         }
     }

@@ -1,14 +1,15 @@
 package com.ikcode.serialization.core.session
 
 import com.ikcode.serialization.core.references.ReferenceAnchor
+import com.ikcode.serialization.core.references.ReferencePointer
 
 class UnpackingSession(dataAnchors: Iterable<ReferenceAnchor>) {
     private val references = dataAnchors.associateBy { it.pointer.name }
     private val instantiatedObjects = HashMap<String, Any>()
-    private val objectData = HashMap<Any, Any>()
+    private val objectData = HashMap<ByReference, Any>()
 
     fun dereference(name: String): Any = this.references[name]!!.value
-    fun getData(obj: Any) = this.objectData[obj]!!
+    fun getData(obj: Any) = this.objectData[ByReference(obj)]!!
 
     fun getInstance(name: String) = this.instantiatedObjects[name]
 
@@ -17,6 +18,13 @@ class UnpackingSession(dataAnchors: Iterable<ReferenceAnchor>) {
             return
 
         this.instantiatedObjects[name] = obj
-        this.objectData[obj] = this.references[name]!!.value
+        this.objectData[ByReference(obj)] = this.references[name]!!.value
+    }
+
+    fun rememberData(obj: Any, data: Any) {
+        if (data is ReferencePointer)
+            this.objectData[ByReference(obj)] = this.references[data.name]!!.value
+        else
+            this.objectData[ByReference(obj)] = data
     }
 }

@@ -169,6 +169,80 @@ class SimpleMapTests {
     }
 
     @Test
+    fun mapNestedIntListTests() {
+        val data = MapNestedIntListData(
+            mapOf(listOf(1) to listOf(10)),
+            mapOf(listOf(2) to listOf(20)),
+            null,
+            mapOf(listOf(3) to listOf(30)),
+        ).apply {
+            mutable = mapOf(listOf(4) to listOf(40))
+            nullableNull = null
+            nullableValue = mapOf(listOf(5) to listOf(50))
+        }
+
+        val session = PackingSession()
+        val pointer = MapNestedIntListData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+        assertEquals(mapOf(listOf(1) to listOf(10)), packed["readonlyC"])
+        assertEquals(mapOf(listOf(2) to listOf(20)), packed["mutableC"])
+        assertEquals(mapOf(listOf(3) to listOf(30)), packed["nullableValueC"])
+        assertEquals(mapOf(listOf(4) to listOf(40)), packed["mutable"])
+        assertEquals(mapOf(listOf(5) to listOf(50)), packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = MapNestedIntListData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+        assertEquals(mapOf(listOf(1) to listOf(10)), unpacked.readonlyC)
+        assertEquals(mapOf(listOf(2) to listOf(20)), unpacked.mutableC)
+        assertEquals(mapOf(listOf(3) to listOf(30)), unpacked.nullableValueC)
+        assertEquals(mapOf(listOf(4) to listOf(40)), unpacked.mutable)
+        assertEquals(mapOf(listOf(5) to listOf(50)), unpacked.nullableValue)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
+    fun mutableMapNestedIntListTests() {
+        val data = MutableMapNestedIntListData(
+            mutableMapOf(mutableListOf(1) to mutableListOf(10)),
+            mutableMapOf(mutableListOf(2) to mutableListOf(20)),
+            null,
+            mutableMapOf(mutableListOf(3) to mutableListOf(30)),
+        ).apply {
+            mutable = mutableMapOf(mutableListOf(4) to mutableListOf(40))
+            nullableNull = null
+            nullableValue = mutableMapOf(mutableListOf(5) to mutableListOf(50))
+        }
+
+        val session = PackingSession()
+        val pointer = MutableMapNestedIntListData_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+        assertEquals(mapOf(listOf(1) to listOf(10)), packed["readonlyC"])
+        assertEquals(mapOf(listOf(2) to listOf(20)), packed["mutableC"])
+        assertEquals(mapOf(listOf(3) to listOf(30)), packed["nullableValueC"])
+        assertEquals(mapOf(listOf(4) to listOf(40)), packed["mutable"])
+        assertEquals(mapOf(listOf(5) to listOf(50)), packed["nullableValue"])
+        assert(!packed.containsKey("nullableNullC"))
+        assert(!packed.containsKey("nullableNull"))
+
+        val unpacked = MutableMapNestedIntListData_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+        assertEquals(mapOf(mutableListOf(1) to mutableListOf(10)).entries, unpacked.readonlyC.entries)
+        assertEquals(mapOf(mutableListOf(2) to mutableListOf(20)).entries, unpacked.mutableC.entries)
+        assertEquals(mapOf(mutableListOf(3) to mutableListOf(30)).entries, unpacked.nullableValueC!!.entries)
+        assertEquals(mapOf(mutableListOf(4) to mutableListOf(40)).entries, unpacked.mutable.entries)
+        assertEquals(mapOf(mutableListOf(5) to mutableListOf(50)).entries, unpacked.nullableValue!!.entries)
+        assertEquals(null, unpacked.nullableNullC)
+        assertEquals(null, unpacked.nullableNull)
+    }
+
+    @Test
     fun objectIntMapTests() {
         val map1 = mapOf(ObjectSample(10) to 1)
         val map2 = mapOf(ObjectSample(20) to 2)

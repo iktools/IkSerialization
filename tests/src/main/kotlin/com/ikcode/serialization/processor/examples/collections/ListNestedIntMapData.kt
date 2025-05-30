@@ -4,14 +4,13 @@ import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 
 @SerializableClass
-class IntMapNestedValueData(
+class ListNestedIntMapData(
     @SerializationData val readonlyC: List<Map<Int, Int>>,
     @SerializationData var mutableC: List<Map<Int, Int>>,
     @SerializationData val nullableNullC: List<Map<Int, Int>>?,
     @SerializationData val nullableValueC: List<Map<Int, Int>>?,
 ) {
-    @SerializationData var mutable: MutableList<Map<Int, Int>> = mutableListOf()
-    @SerializationData var nullableNull: MutableList<Map<Int, Int>>? = mutableListOf()
-    @SerializationData var nullableValue: MutableList<Map<Int, Int>>? = mutableListOf()
-    @SerializationData val readonly = mutableListOf<Map<Int, Int>>()
+    @SerializationData var mutable: List<Map<Int, Int>> = listOf()
+    @SerializationData var nullableNull: List<Map<Int, Int>>? = listOf()
+    @SerializationData var nullableValue: List<Map<Int, Int>>? = listOf()
 }
