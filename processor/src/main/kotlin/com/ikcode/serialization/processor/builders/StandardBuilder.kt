@@ -98,6 +98,7 @@ class StandardBuilder(
     }
 
     override fun fill(funBuilder: FunSpec.Builder) {
+        //funBuilder.addStatement("if (session.fillGuard(obj)) return")
         funBuilder.addStatement("val objData = session.getData(obj) as Map<*, *>")
 
         for (field in classInfo.allProperties) {

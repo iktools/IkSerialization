@@ -7,6 +7,7 @@ class UnpackingSession(dataAnchors: Iterable<ReferenceAnchor>) {
     private val references = dataAnchors.associateBy { it.pointer.name }
     private val instantiatedObjects = HashMap<String, Any>()
     private val objectData = HashMap<ByReference, Any>()
+    private val finishedObjects = HashSet<ByReference>()
 
     fun dereference(name: String): Any = this.references[name]!!.value
     fun getData(obj: Any) = this.objectData[ByReference(obj)]!!
@@ -27,4 +28,9 @@ class UnpackingSession(dataAnchors: Iterable<ReferenceAnchor>) {
         else
             this.objectData[ByReference(obj)] = data
     }
+
+    fun fillGuard(obj: Any) =
+        finishedObjects.contains(ByReference(obj)).also {
+            if (!it) finishedObjects.add(ByReference(obj))
+        }
 }

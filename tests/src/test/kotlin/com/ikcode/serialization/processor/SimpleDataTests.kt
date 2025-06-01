@@ -153,6 +153,25 @@ class SimpleDataTests {
     }
 
     @Test
+    fun fillableSingleTests() {
+        val data = FillableObject().apply {
+            simpleData = 1
+        }
+        val session = PackingSession()
+        val pointer = FillableObject_Packer().pack(data, session) as ReferencePointer
+        val packed = session.referencedData.first { it.pointer == pointer}.dataMap
+
+        assertEquals(1, packed["simpleData"])
+
+        val unpacked = FillableObject_Packer().unpack(
+            pointer,
+            UnpackingSession(session.referencedData)
+        )
+
+        assertEquals(1, unpacked.simpleData)
+    }
+
+    @Test
     fun floatTests() {
         val data = FloatData(1f, 2f, null, 3f).apply {
             mutable = 4f
