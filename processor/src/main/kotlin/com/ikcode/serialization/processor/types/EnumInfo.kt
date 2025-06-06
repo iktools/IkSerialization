@@ -11,10 +11,6 @@ class EnumInfo(ksType: KSType): ATypeInfo(ksType) {
         code.add("%T.entries[($data as Number).toInt()]", this.kpType)
     }
 
-    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        TODO("Not yet implemented")
-    }
-
     override fun pack(code: CodeBlock.Builder, data: String) {
         code.add("$data.ordinal")
     }

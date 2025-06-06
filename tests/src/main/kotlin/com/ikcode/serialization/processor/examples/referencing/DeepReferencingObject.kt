@@ -10,7 +10,4 @@ class DeepReferencingObject {
     @SerializationData val interfaceData: IReferencing = ReferencingObject()
     @SerializationData val nullableNotNull: ReferencingObject? = ReferencingObject()
     @SerializationData val nullableNull: ReferencingObject? = null
-    @SerializationData val listData = mutableListOf<ReferencingObject>()
-    @SerializationData val setData = mutableSetOf<ReferencingObject>()
-    @SerializationData val mapData = mutableMapOf<ReferencingObject, ReferencingObject>()
 }

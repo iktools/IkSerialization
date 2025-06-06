@@ -40,7 +40,7 @@ abstract class ABuilder(
 
         val rememberFunc = FunSpec.builder("remember")
             .addParameter("obj", this.classInfo.kpType)
-            .addParameter("name", String::class)
+            .addParameter("packedData", Any::class)
             .addParameter("session", UnpackingSession::class)
         this.remember(rememberFunc)
 

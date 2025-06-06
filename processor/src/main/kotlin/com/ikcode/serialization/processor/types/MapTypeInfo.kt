@@ -43,10 +43,6 @@ class MapTypeInfo(
         }
     }
 
-    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        //TODO("Not yet implemented")
-    }
-
     override fun pack(code: CodeBlock.Builder, data: String) {
         code.beginControlFlow("$data.map")
         this.keyType.pack(code, "it.key!!")

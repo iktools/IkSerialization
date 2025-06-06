@@ -45,9 +45,9 @@ class AbstractBuilder(
     override fun remember(funBuilder: FunSpec.Builder) {
         funBuilder.beginControlFlow("when(obj)")
         for (subclass in classInfo.subclasses)
-            funBuilder.addStatement("is %T -> %T().remember(obj, name, session)", subclass.kpType, subclass.packerType)
+            funBuilder.addStatement("is %T -> %T().remember(obj, packedData, session)", subclass.kpType, subclass.packerType)
         if (classInfo.isOpen)
-            funBuilder.addStatement("else -> otherSubclasses[obj.javaClass]?.remember(obj, name, session) ?: throw Exception(\"Unknown·${classInfo.name}·subtype\")")
+            funBuilder.addStatement("else -> otherSubclasses[obj.javaClass]?.remember(obj, packedData, session) ?: throw Exception(\"Unknown·${classInfo.name}·subtype\")")
         else
             funBuilder.addStatement("else -> throw Exception(\"Unknown ${classInfo.name} subtype\")")
         funBuilder.endControlFlow()

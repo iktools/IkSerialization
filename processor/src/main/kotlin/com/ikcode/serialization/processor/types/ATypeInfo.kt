@@ -12,7 +12,7 @@ abstract class ATypeInfo(val ksType: KSType) {
 
     abstract val fillable: Boolean
     abstract fun instantiate(code: CodeBlock.Builder, data: String)
-    open fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) { }
+    open fun remember(funBuilder: FunSpec.Builder, obj: String, data: String) { }
     abstract fun pack(code: CodeBlock.Builder, data: String)
     abstract fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean)
 

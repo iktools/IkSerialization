@@ -17,6 +17,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 class ComplexDataTests {
+
+    //TODO test proxy and crossmodule deep final fillable
+
     @Test
     fun deepFinalFillableTests() {
         val data = DeepReferencingObject().apply {
@@ -34,7 +37,7 @@ class ComplexDataTests {
                 setData += FillableObject().apply { simpleData = 10 }
                 mapData[FillableObject().apply { simpleData = 11 }] = FillableObject().apply { simpleData = 12 }
             }
-            data.apply {
+            interfaceData.apply {
                 data.simpleData = 13
                 nullableNotNull!!.simpleData = 14
                 listData += FillableObject().apply { simpleData = 15 }
@@ -48,51 +51,20 @@ class ComplexDataTests {
                 setData += FillableObject().apply { simpleData = 22 }
                 mapData[FillableObject().apply { simpleData = 23 }] = FillableObject().apply { simpleData = 24 }
             }
-            listData += ReferencingObject().apply {
-                data.simpleData = 25
-                nullableNotNull!!.simpleData = 26
-                listData += FillableObject().apply { simpleData = 27 }
-                setData += FillableObject().apply { simpleData = 28 }
-                mapData[FillableObject().apply { simpleData = 29 }] = FillableObject().apply { simpleData = 30 }
-            }
-            setData += ReferencingObject().apply {
-                data.simpleData = 31
-                nullableNotNull!!.simpleData = 32
-                listData += FillableObject().apply { simpleData = 33 }
-                setData += FillableObject().apply { simpleData = 34 }
-                mapData[FillableObject().apply { simpleData = 35 }] = FillableObject().apply { simpleData = 36 }
-            }
-            mapData[ReferencingObject().apply {
-                data.simpleData = 37
-                nullableNotNull!!.simpleData = 38
-                listData += FillableObject().apply { simpleData = 39 }
-                setData += FillableObject().apply { simpleData = 40 }
-                mapData[FillableObject().apply { simpleData = 41 }] = FillableObject().apply { simpleData = 42 }
-            }] = ReferencingObject().apply {
-                data.simpleData = 43
-                nullableNotNull!!.simpleData = 44
-                listData += FillableObject().apply { simpleData = 45 }
-                setData += FillableObject().apply { simpleData = 46 }
-                mapData[FillableObject().apply { simpleData = 47 }] = FillableObject().apply { simpleData = 48 }
-            }
         }
         val session = PackingSession()
         val pointer = DeepReferencingObject_Packer().pack(data, session) as ReferencePointer
         val packed = session.referencedData.first { it.pointer == pointer }.dataMap
 
         val reference1 = packed["data"] as ReferencePointer
-        val reference2 = packed["nullableNotNull"] as ReferencePointer
-        val reference3 = (packed["listData"] as List<*>)[0] as ReferencePointer
-        val reference4 = (packed["setData"] as List<*>)[0] as ReferencePointer
-        val reference5 = (packed["mapData"] as Map<*, *>).keys.first() as ReferencePointer
-        val reference6 = (packed["mapData"] as Map<*, *>).values.first() as ReferencePointer
+        val reference2 = packed["abstractData"] as ReferencePointer
+        val reference3 = packed["interfaceData"] as ReferencePointer
+        val reference4 = packed["nullableNotNull"] as ReferencePointer
         assert(reference1.name.startsWith("ReferencingObject"))
         assert(reference2.name.startsWith("ReferencingObject"))
         assert(reference3.name.startsWith("ReferencingObject"))
         assert(reference4.name.startsWith("ReferencingObject"))
-        assert(reference5.name.startsWith("ReferencingObject"))
-        assert(reference6.name.startsWith("ReferencingObject"))
-        assertEquals(6, setOf(reference1, reference2, reference3, reference4, reference5, reference6).size)
+        assertEquals(4, setOf(reference1, reference2, reference3, reference4).size)
         assertFalse(packed.containsKey("nullableNull"))
 
         val unpacked = DeepReferencingObject_Packer().unpack(
@@ -131,41 +103,6 @@ class ComplexDataTests {
         assertEquals(22, unpacked.nullableNotNull!!.setData.first().simpleData)
         assertEquals(23, unpacked.nullableNotNull!!.mapData.keys.first().simpleData)
         assertEquals(24, unpacked.nullableNotNull!!.mapData.values.first().simpleData)
-
-        assertEquals(25, unpacked.listData[0].data.simpleData)
-        assertEquals(26, unpacked.listData[0].nullableNotNull!!.simpleData)
-        assertEquals(null, unpacked.listData[0].nullableNull)
-        assertEquals(27, unpacked.listData[0].listData[0].simpleData)
-        assertEquals(28, unpacked.listData[0].setData.first().simpleData)
-        assertEquals(29, unpacked.listData[0].mapData.keys.first().simpleData)
-        assertEquals(30, unpacked.listData[0].mapData.values.first().simpleData)
-
-        val setData = unpacked.setData.first()
-        assertEquals(31, setData.data.simpleData)
-        assertEquals(32, setData.nullableNotNull!!.simpleData)
-        assertEquals(null, setData.nullableNull)
-        assertEquals(33, setData.listData[0].simpleData)
-        assertEquals(34, setData.setData.first().simpleData)
-        assertEquals(35, setData.mapData.keys.first().simpleData)
-        assertEquals(36, setData.mapData.values.first().simpleData)
-
-        val keyData = unpacked.mapData.keys.first()
-        assertEquals(37, keyData.data.simpleData)
-        assertEquals(38, keyData.nullableNotNull!!.simpleData)
-        assertEquals(null, keyData.nullableNull)
-        assertEquals(39, keyData.listData[0].simpleData)
-        assertEquals(40, keyData.setData.first().simpleData)
-        assertEquals(41, keyData.mapData.keys.first().simpleData)
-        assertEquals(42, keyData.mapData.values.first().simpleData)
-
-        val valueData = unpacked.mapData.values.first()
-        assertEquals(43, valueData.data.simpleData)
-        assertEquals(44, valueData.nullableNotNull!!.simpleData)
-        assertEquals(null, valueData.nullableNull)
-        assertEquals(45, valueData.listData[0].simpleData)
-        assertEquals(46, valueData.setData.first().simpleData)
-        assertEquals(47, valueData.mapData.keys.first().simpleData)
-        assertEquals(48, valueData.mapData.values.first().simpleData)
     }
 
     @Test

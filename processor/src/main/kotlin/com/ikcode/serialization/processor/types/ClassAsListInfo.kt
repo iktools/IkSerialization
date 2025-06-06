@@ -34,10 +34,6 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
         code.add(")")
     }
 
-    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        TODO("Not yet implemented")
-    }
-
     override fun pack(code: CodeBlock.Builder, data: String) {
         val lineBreaker = LineBreaker(this.allProperties.size)
         code.add("listOf(")

@@ -14,10 +14,6 @@ class ProxyTypeInfo(ksType: KSType, val proxy: ATypeInfo): ATypeInfo(ksType) {
         code.add(")")
     }
 
-    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        TODO("Not yet implemented")
-    }
-
     override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {
         if (!instantiate)
             throw IllegalArgumentException("Proxied type can't be filled")

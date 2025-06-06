@@ -14,8 +14,8 @@ class ClassInfo(ksType: KSType): ATypeInfo(ksType) {
         code.add("%T().instantiate($data, session)", this.packerType)
     }
 
-    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        funBuilder.addStatement("%T().remember($obj, $name)", this.packerType)
+    override fun remember(funBuilder: FunSpec.Builder, obj: String, data: String) {
+        funBuilder.addStatement("%T().remember($obj, $data)", this.packerType)
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {

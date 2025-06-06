@@ -34,7 +34,7 @@ class ProxyBuilder(
     }
 
     override fun remember(funBuilder: FunSpec.Builder) {
-        this.proxyType.remember(funBuilder, "obj", "name")
+        funBuilder.addComment("no operation")
     }
 
     override fun fill(funBuilder: FunSpec.Builder) {

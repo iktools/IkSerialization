@@ -11,10 +11,6 @@ class PrimitiveInfo(ksType: KSType): ATypeInfo(ksType) {
         code.add("$data as ${this.name}")
     }
 
-    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        TODO("Not yet implemented")
-    }
-
     override fun pack(code: CodeBlock.Builder, data: String) {
         code.add(data)
     }

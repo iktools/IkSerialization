@@ -85,11 +85,12 @@ class StandardBuilder(
                 funBuilder.endControlFlow()
         }
 
-        funBuilder.addStatement("this.remember(obj, name, session)")
+        funBuilder.addStatement("this.remember(obj, packedData, session)")
         funBuilder.addStatement("return obj")
     }
 
     override fun remember(funBuilder: FunSpec.Builder) {
+        funBuilder.addStatement("val name = (packedData as ReferencePointer).name")
         funBuilder.addStatement("val objData = session.dereference(name) as Map<*, *>")
 
         classInfo.allProperties.filter { property ->
@@ -103,7 +104,7 @@ class StandardBuilder(
             if (property.type.isNullable)
                 funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
 
-            property.type.remember(funBuilder, "obj.${property.name}!!", "(objData[\"${property.name}\"] as ReferencePointer).name, session")
+            property.type.remember(funBuilder, "obj.${property.name}!!", "objData[\"${property.name}\"]!!, session")
 
             if (property.type.isNullable)
                 funBuilder.endControlFlow()
@@ -165,10 +166,10 @@ class StandardBuilder(
 
             typeBuilder.addFunction(FunSpec.builder("remember")
                 .addParameter("obj", it.kpType)
-                .addParameter("name", String::class)
+                .addParameter("packedData", Any::class)
                 .addParameter("session", UnpackingSession::class)
                 .addModifiers(KModifier.OVERRIDE)
-                .addStatement("this.remember(obj as %T, name, session)", this.classInfo.kpType)
+                .addStatement("this.remember(obj as %T, packedData, session)", this.classInfo.kpType)
                 .build()
             )
 
