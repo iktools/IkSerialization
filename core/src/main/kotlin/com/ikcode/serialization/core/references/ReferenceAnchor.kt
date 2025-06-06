@@ -1,6 +1,6 @@
 package com.ikcode.serialization.core.references
 
-class ReferenceAnchor(val value: Any, val pointer: ReferencePointer) {
+class ReferenceAnchor(val value: Any, val pointer: ReferencePointer, val factory: FactoryPointer? = null) {
     val dataMap get() = this.value as HashMap<*, *>
 
     override fun equals(other: Any?): Boolean {

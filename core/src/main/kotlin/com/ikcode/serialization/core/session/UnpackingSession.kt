@@ -29,6 +29,15 @@ class UnpackingSession(dataAnchors: Iterable<ReferenceAnchor>) {
             this.objectData[ByReference(obj)] = data
     }
 
+    fun rememberProduced(obj: Any, factory: String, property: String) {
+        val reference = this.references.entries.first {
+            it.value.factory?.reference == factory && it.value.factory?.property == property
+        }.value.pointer
+
+        instantiatedObjects[reference.name] = obj
+        finishedObjects += ByReference(obj)
+    }
+
     fun fillGuard(obj: Any) =
         finishedObjects.contains(ByReference(obj)).also {
             if (!it) finishedObjects.add(ByReference(obj))

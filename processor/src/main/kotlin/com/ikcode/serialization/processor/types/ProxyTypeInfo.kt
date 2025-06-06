@@ -2,6 +2,7 @@ package com.ikcode.serialization.processor.types
 
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FunSpec
 
 class ProxyTypeInfo(ksType: KSType, val proxy: ATypeInfo): ATypeInfo(ksType) {
     override val fillable: Boolean
@@ -11,6 +12,10 @@ class ProxyTypeInfo(ksType: KSType, val proxy: ATypeInfo): ATypeInfo(ksType) {
         code.add("%T(", kpType)
         this.proxy.instantiate(code, data)
         code.add(")")
+    }
+
+    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
+        TODO("Not yet implemented")
     }
 
     override fun fill(code: CodeBlock.Builder, data: String, destination: String, instantiate: Boolean) {

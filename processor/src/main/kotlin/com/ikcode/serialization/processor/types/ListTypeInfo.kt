@@ -2,6 +2,7 @@ package com.ikcode.serialization.processor.types
 
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FunSpec
 
 class ListTypeInfo(
     ksType: KSType,
@@ -34,6 +35,10 @@ class ListTypeInfo(
 
             this.collector(code)
         }
+    }
+
+    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
+        //TODO("Not yet implemented")
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {

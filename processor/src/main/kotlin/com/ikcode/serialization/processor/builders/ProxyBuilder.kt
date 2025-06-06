@@ -33,6 +33,10 @@ class ProxyBuilder(
         funBuilder.addCode(code.build())
     }
 
+    override fun remember(funBuilder: FunSpec.Builder) {
+        this.proxyType.remember(funBuilder, "obj", "name")
+    }
+
     override fun fill(funBuilder: FunSpec.Builder) {
         funBuilder.addComment("no operation")
     }

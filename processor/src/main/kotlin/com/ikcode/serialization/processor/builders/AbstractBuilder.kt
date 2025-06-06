@@ -42,6 +42,10 @@ class AbstractBuilder(
         funBuilder.endControlFlow()
     }
 
+    override fun remember(funBuilder: FunSpec.Builder) {
+        //TODO("Not yet implemented")
+    }
+
     override fun fill(funBuilder: FunSpec.Builder) {
         funBuilder.beginControlFlow("when(obj)")
         for (subclass in classInfo.subclasses)

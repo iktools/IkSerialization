@@ -83,11 +83,20 @@ class StandardBuilder(
                         it.name != property.ksName
                     }
         }.forEach { property ->
-            funBuilder.addComment("Remember ${property.name}")
             if (property.type.isNullable)
                 funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
 
-            funBuilder.addStatement("session.rememberInstance(obj.${property.name}!!, (objData[\"${property.name}\"] as %T).name)", ReferencePointer::class)
+            property.type.remember(funBuilder, "obj.${property.name}!!", "(objData[\"${property.name}\"] as %T).name")
+
+            if (property.type.isNullable)
+                funBuilder.endControlFlow()
+        }
+
+        classInfo.producedData.forEach { property ->
+            if (property.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
+
+            funBuilder.addStatement("session.rememberProduced(obj.${property.name}!!, name, \"${property.name}\")")
 
             if (property.type.isNullable)
                 funBuilder.endControlFlow()
@@ -95,6 +104,10 @@ class StandardBuilder(
 
         funBuilder.addStatement("session.rememberInstance(obj, name)")
         funBuilder.addStatement("return obj")
+    }
+
+    override fun remember(funBuilder: FunSpec.Builder) {
+        funBuilder.addStatement("session.rememberInstance(obj, name)", ReferencePointer::class)
     }
 
     override fun fill(funBuilder: FunSpec.Builder) {
@@ -180,6 +193,16 @@ class StandardBuilder(
             field.type.pack(codeBuilder, getValue)
             codeBuilder.add("\n")
             packOwnFunc.addCode(codeBuilder.build())
+
+            if (field.type.isNullable)
+                packOwnFunc.endControlFlow()
+        }
+        for (field in classInfo.producedData) {
+            if (field.type.isNullable)
+                packOwnFunc.beginControlFlow("if (obj.${field.name} != null)")
+
+            //TODO
+            packOwnFunc.addStatement("session.register(obj.${field.name}, \"${field.type.name}\", session.referenceFor(obj).name, \"${field.name}\")")
 
             if (field.type.isNullable)
                 packOwnFunc.endControlFlow()

@@ -18,6 +18,10 @@ class EnumBuilder(
         funBuilder.addStatement("return %T.values()[packedData as Int]", classInfo.kpType)
     }
 
+    override fun remember(funBuilder: FunSpec.Builder) {
+        funBuilder.addComment("no operation")
+    }
+
     override fun fill(funBuilder: FunSpec.Builder) {
         funBuilder.addComment("no operation")
     }

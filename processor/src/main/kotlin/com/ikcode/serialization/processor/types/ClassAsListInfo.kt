@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.ikcode.serialization.processor.LineBreaker
 import com.ikcode.serialization.processor.builders.PropertyInfo
 import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FunSpec
 
 class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: TypeUtil): ATypeInfo(ksType) {
     private val constructorParams = declaration.primaryConstructor?.parameters ?: listOf()
@@ -31,6 +32,10 @@ class ClassAsListInfo(ksType: KSType, declaration: KSClassDeclaration, types: Ty
         }
 
         code.add(")")
+    }
+
+    override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
+        TODO("Not yet implemented")
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {

@@ -6,6 +6,7 @@ import com.google.devtools.ksp.isAnnotationPresent
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Modifier
+import com.ikcode.serialization.core.annotations.ReferenceOnly
 import com.ikcode.serialization.core.annotations.SerializableClass
 import com.ikcode.serialization.core.annotations.SerializationData
 import com.ikcode.serialization.processor.builders.PropertyInfo
@@ -53,6 +54,13 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     @OptIn(KspExperimental::class)
     val allProperties = declaration.getAllProperties().filter {
         it.isAnnotationPresent(SerializationData::class)
+    }.map {
+        PropertyInfo(it, declaration.asStarProjectedType(), types, this.constructorParams.any { param -> param.name == it.simpleName })
+    }.toList()
+
+    @OptIn(KspExperimental::class)
+    val producedData = declaration.getAllProperties().filter {
+        it.isAnnotationPresent(ReferenceOnly::class)
     }.map {
         PropertyInfo(it, declaration.asStarProjectedType(), types, this.constructorParams.any { param -> param.name == it.simpleName })
     }.toList()

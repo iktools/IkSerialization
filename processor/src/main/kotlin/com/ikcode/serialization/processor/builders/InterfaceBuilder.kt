@@ -21,6 +21,10 @@ class InterfaceBuilder(
         funBuilder.addModifiers(KModifier.ABSTRACT)
     }
 
+    override fun remember(funBuilder: FunSpec.Builder) {
+        funBuilder.addModifiers(KModifier.ABSTRACT)
+    }
+
     override fun fill(funBuilder: FunSpec.Builder) {
         funBuilder.addModifiers(KModifier.ABSTRACT)
     }

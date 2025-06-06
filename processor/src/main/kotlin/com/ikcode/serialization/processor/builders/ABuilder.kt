@@ -13,6 +13,7 @@ abstract class ABuilder(
     abstract fun pack(funBuilder: FunSpec.Builder)
     abstract fun unpack(funBuilder: FunSpec.Builder)
     abstract fun instantiate(funBuilder: FunSpec.Builder)
+    abstract fun remember(funBuilder: FunSpec.Builder)
     abstract fun fill(funBuilder: FunSpec.Builder)
     open fun extras(typeBuilder: TypeSpec.Builder) {}
 
@@ -36,6 +37,13 @@ abstract class ABuilder(
             .addParameter("session", UnpackingSession::class)
             .returns(this.classInfo.kpType)
         this.instantiate(instantiateFunc)
+
+        val rememberFunc = FunSpec.builder("remember")
+            .addParameter("obj", this.classInfo.kpType)
+            .addParameter("name", String::class)
+            .addParameter("session", UnpackingSession::class)
+            .returns(this.classInfo.kpType)
+        this.remember(rememberFunc)
 
         val fillDataFunc = FunSpec.builder("fillData")
             .addParameter("obj", this.classInfo.kpType)
