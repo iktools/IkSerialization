@@ -42,7 +42,6 @@ abstract class ABuilder(
             .addParameter("obj", this.classInfo.kpType)
             .addParameter("name", String::class)
             .addParameter("session", UnpackingSession::class)
-            .returns(this.classInfo.kpType)
         this.remember(rememberFunc)
 
         val fillDataFunc = FunSpec.builder("fillData")
@@ -54,6 +53,7 @@ abstract class ABuilder(
             .addFunction(packFunc.build())
             .addFunction(unpackFunc.build())
             .addFunction(instantiateFunc.build())
+            .addFunction(rememberFunc.build())
             .addFunction(fillDataFunc.build())
         this.extras(type)
 

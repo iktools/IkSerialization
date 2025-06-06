@@ -27,39 +27,53 @@ class ComplexDataTests {
                 setData += FillableObject().apply { simpleData = 4 }
                 mapData[FillableObject().apply { simpleData = 5 }] = FillableObject().apply { simpleData = 6 }
             }
-            nullableNotNull!!.apply {
+            abstractData.apply {
                 data.simpleData = 7
                 nullableNotNull!!.simpleData = 8
                 listData += FillableObject().apply { simpleData = 9 }
                 setData += FillableObject().apply { simpleData = 10 }
                 mapData[FillableObject().apply { simpleData = 11 }] = FillableObject().apply { simpleData = 12 }
             }
-            listData += ReferencingObject().apply {
+            data.apply {
                 data.simpleData = 13
                 nullableNotNull!!.simpleData = 14
                 listData += FillableObject().apply { simpleData = 15 }
                 setData += FillableObject().apply { simpleData = 16 }
                 mapData[FillableObject().apply { simpleData = 17 }] = FillableObject().apply { simpleData = 18 }
             }
-            setData += ReferencingObject().apply {
+            nullableNotNull!!.apply {
                 data.simpleData = 19
                 nullableNotNull!!.simpleData = 20
                 listData += FillableObject().apply { simpleData = 21 }
                 setData += FillableObject().apply { simpleData = 22 }
                 mapData[FillableObject().apply { simpleData = 23 }] = FillableObject().apply { simpleData = 24 }
             }
-            mapData[ReferencingObject().apply {
+            listData += ReferencingObject().apply {
                 data.simpleData = 25
                 nullableNotNull!!.simpleData = 26
                 listData += FillableObject().apply { simpleData = 27 }
                 setData += FillableObject().apply { simpleData = 28 }
                 mapData[FillableObject().apply { simpleData = 29 }] = FillableObject().apply { simpleData = 30 }
-            }] = ReferencingObject().apply {
+            }
+            setData += ReferencingObject().apply {
                 data.simpleData = 31
                 nullableNotNull!!.simpleData = 32
                 listData += FillableObject().apply { simpleData = 33 }
                 setData += FillableObject().apply { simpleData = 34 }
                 mapData[FillableObject().apply { simpleData = 35 }] = FillableObject().apply { simpleData = 36 }
+            }
+            mapData[ReferencingObject().apply {
+                data.simpleData = 37
+                nullableNotNull!!.simpleData = 38
+                listData += FillableObject().apply { simpleData = 39 }
+                setData += FillableObject().apply { simpleData = 40 }
+                mapData[FillableObject().apply { simpleData = 41 }] = FillableObject().apply { simpleData = 42 }
+            }] = ReferencingObject().apply {
+                data.simpleData = 43
+                nullableNotNull!!.simpleData = 44
+                listData += FillableObject().apply { simpleData = 45 }
+                setData += FillableObject().apply { simpleData = 46 }
+                mapData[FillableObject().apply { simpleData = 47 }] = FillableObject().apply { simpleData = 48 }
             }
         }
         val session = PackingSession()
@@ -94,48 +108,64 @@ class ComplexDataTests {
         assertEquals(5, unpacked.data.mapData.keys.first().simpleData)
         assertEquals(6, unpacked.data.mapData.values.first().simpleData)
 
-        assertEquals(7, unpacked.nullableNotNull!!.data.simpleData)
-        assertEquals(8, unpacked.nullableNotNull!!.nullableNotNull!!.simpleData)
-        assertEquals(null, unpacked.nullableNotNull!!.nullableNull)
-        assertEquals(9, unpacked.nullableNotNull!!.listData[0].simpleData)
-        assertEquals(10, unpacked.nullableNotNull!!.setData.first().simpleData)
-        assertEquals(11, unpacked.nullableNotNull!!.mapData.keys.first().simpleData)
-        assertEquals(12, unpacked.nullableNotNull!!.mapData.values.first().simpleData)
+        assertEquals(7, unpacked.abstractData.data.simpleData)
+        assertEquals(8, unpacked.abstractData.nullableNotNull!!.simpleData)
+        assertEquals(null, unpacked.abstractData.nullableNull)
+        assertEquals(9, unpacked.abstractData.listData[0].simpleData)
+        assertEquals(10, unpacked.abstractData.setData.first().simpleData)
+        assertEquals(11, unpacked.abstractData.mapData.keys.first().simpleData)
+        assertEquals(12, unpacked.abstractData.mapData.values.first().simpleData)
 
-        assertEquals(13, unpacked.listData[0].data.simpleData)
-        assertEquals(14, unpacked.listData[0].nullableNotNull!!.simpleData)
+        assertEquals(13, unpacked.interfaceData.data.simpleData)
+        assertEquals(14, unpacked.interfaceData.nullableNotNull!!.simpleData)
+        assertEquals(null, unpacked.interfaceData.nullableNull)
+        assertEquals(15, unpacked.interfaceData.listData[0].simpleData)
+        assertEquals(16, unpacked.interfaceData.setData.first().simpleData)
+        assertEquals(17, unpacked.interfaceData.mapData.keys.first().simpleData)
+        assertEquals(18, unpacked.interfaceData.mapData.values.first().simpleData)
+
+        assertEquals(19, unpacked.nullableNotNull!!.data.simpleData)
+        assertEquals(20, unpacked.nullableNotNull!!.nullableNotNull!!.simpleData)
+        assertEquals(null, unpacked.nullableNotNull!!.nullableNull)
+        assertEquals(21, unpacked.nullableNotNull!!.listData[0].simpleData)
+        assertEquals(22, unpacked.nullableNotNull!!.setData.first().simpleData)
+        assertEquals(23, unpacked.nullableNotNull!!.mapData.keys.first().simpleData)
+        assertEquals(24, unpacked.nullableNotNull!!.mapData.values.first().simpleData)
+
+        assertEquals(25, unpacked.listData[0].data.simpleData)
+        assertEquals(26, unpacked.listData[0].nullableNotNull!!.simpleData)
         assertEquals(null, unpacked.listData[0].nullableNull)
-        assertEquals(15, unpacked.listData[0].listData[0].simpleData)
-        assertEquals(16, unpacked.listData[0].setData.first().simpleData)
-        assertEquals(17, unpacked.listData[0].mapData.keys.first().simpleData)
-        assertEquals(18, unpacked.listData[0].mapData.values.first().simpleData)
+        assertEquals(27, unpacked.listData[0].listData[0].simpleData)
+        assertEquals(28, unpacked.listData[0].setData.first().simpleData)
+        assertEquals(29, unpacked.listData[0].mapData.keys.first().simpleData)
+        assertEquals(30, unpacked.listData[0].mapData.values.first().simpleData)
 
         val setData = unpacked.setData.first()
-        assertEquals(19, setData.data.simpleData)
-        assertEquals(20, setData.nullableNotNull!!.simpleData)
+        assertEquals(31, setData.data.simpleData)
+        assertEquals(32, setData.nullableNotNull!!.simpleData)
         assertEquals(null, setData.nullableNull)
-        assertEquals(21, setData.listData[0].simpleData)
-        assertEquals(22, setData.setData.first().simpleData)
-        assertEquals(23, setData.mapData.keys.first().simpleData)
-        assertEquals(24, setData.mapData.values.first().simpleData)
+        assertEquals(33, setData.listData[0].simpleData)
+        assertEquals(34, setData.setData.first().simpleData)
+        assertEquals(35, setData.mapData.keys.first().simpleData)
+        assertEquals(36, setData.mapData.values.first().simpleData)
 
         val keyData = unpacked.mapData.keys.first()
-        assertEquals(25, keyData.data.simpleData)
-        assertEquals(26, keyData.nullableNotNull!!.simpleData)
+        assertEquals(37, keyData.data.simpleData)
+        assertEquals(38, keyData.nullableNotNull!!.simpleData)
         assertEquals(null, keyData.nullableNull)
-        assertEquals(27, keyData.listData[0].simpleData)
-        assertEquals(28, keyData.setData.first().simpleData)
-        assertEquals(29, keyData.mapData.keys.first().simpleData)
-        assertEquals(30, keyData.mapData.values.first().simpleData)
+        assertEquals(39, keyData.listData[0].simpleData)
+        assertEquals(40, keyData.setData.first().simpleData)
+        assertEquals(41, keyData.mapData.keys.first().simpleData)
+        assertEquals(42, keyData.mapData.values.first().simpleData)
 
         val valueData = unpacked.mapData.values.first()
-        assertEquals(31, valueData.data.simpleData)
-        assertEquals(32, valueData.nullableNotNull!!.simpleData)
+        assertEquals(43, valueData.data.simpleData)
+        assertEquals(44, valueData.nullableNotNull!!.simpleData)
         assertEquals(null, valueData.nullableNull)
-        assertEquals(33, valueData.listData[0].simpleData)
-        assertEquals(34, valueData.setData.first().simpleData)
-        assertEquals(35, valueData.mapData.keys.first().simpleData)
-        assertEquals(36, valueData.mapData.values.first().simpleData)
+        assertEquals(45, valueData.listData[0].simpleData)
+        assertEquals(46, valueData.setData.first().simpleData)
+        assertEquals(47, valueData.mapData.keys.first().simpleData)
+        assertEquals(48, valueData.mapData.values.first().simpleData)
     }
 
     @Test

@@ -75,23 +75,6 @@ class StandardBuilder(
             funBuilder.addCode(code.build())
         }
 
-        classInfo.allProperties.filter { property ->
-            !property.isMutable
-                    && property.type.fillable
-                    && needsRemembering(property.type)
-                    && classInfo.constructorParams.all {
-                        it.name != property.ksName
-                    }
-        }.forEach { property ->
-            if (property.type.isNullable)
-                funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
-
-            property.type.remember(funBuilder, "obj.${property.name}!!", "(objData[\"${property.name}\"] as %T).name")
-
-            if (property.type.isNullable)
-                funBuilder.endControlFlow()
-        }
-
         classInfo.producedData.forEach { property ->
             if (property.type.isNullable)
                 funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
@@ -102,12 +85,30 @@ class StandardBuilder(
                 funBuilder.endControlFlow()
         }
 
-        funBuilder.addStatement("session.rememberInstance(obj, name)")
+        funBuilder.addStatement("this.remember(obj, name, session)")
         funBuilder.addStatement("return obj")
     }
 
     override fun remember(funBuilder: FunSpec.Builder) {
-        funBuilder.addStatement("session.rememberInstance(obj, name)", ReferencePointer::class)
+        funBuilder.addStatement("val objData = session.dereference(name) as Map<*, *>")
+
+        classInfo.allProperties.filter { property ->
+            !property.isMutable
+                    && property.type.fillable
+                    && needsRemembering(property.type)
+                    && classInfo.constructorParams.all {
+                it.name != property.ksName
+            }
+        }.forEach { property ->
+            if (property.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
+
+            property.type.remember(funBuilder, "obj.${property.name}!!", "(objData[\"${property.name}\"] as ReferencePointer).name, session")
+
+            if (property.type.isNullable)
+                funBuilder.endControlFlow()
+        }
+        funBuilder.addStatement("session.rememberInstance(obj, name)")
     }
 
     override fun fill(funBuilder: FunSpec.Builder) {
@@ -159,6 +160,15 @@ class StandardBuilder(
                 .addModifiers(KModifier.OVERRIDE)
                 .returns(Any::class)
                 .addStatement("return this.pack(obj as %T, session)", this.classInfo.kpType)
+                .build()
+            )
+
+            typeBuilder.addFunction(FunSpec.builder("remember")
+                .addParameter("obj", it.kpType)
+                .addParameter("name", String::class)
+                .addParameter("session", UnpackingSession::class)
+                .addModifiers(KModifier.OVERRIDE)
+                .addStatement("this.remember(obj as %T, name, session)", this.classInfo.kpType)
                 .build()
             )
 

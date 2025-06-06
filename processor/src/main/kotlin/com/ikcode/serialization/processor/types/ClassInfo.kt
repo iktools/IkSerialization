@@ -15,7 +15,7 @@ class ClassInfo(ksType: KSType): ATypeInfo(ksType) {
     }
 
     override fun remember(funBuilder: FunSpec.Builder, obj: String, name: String) {
-        funBuilder.addStatement("session.rememberInstance($obj, $name)", ReferencePointer::class)
+        funBuilder.addStatement("%T().remember($obj, $name)", this.packerType)
     }
 
     override fun pack(code: CodeBlock.Builder, data: String) {

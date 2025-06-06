@@ -5,11 +5,17 @@ import com.ikcode.serialization.core.annotations.SerializationData
 import com.ikcode.serialization.processor.examples.simple.FillableObject
 
 @SerializableClass
-class ReferencingObject {
-    @SerializationData val data = FillableObject()
-    @SerializationData val nullableNotNull: FillableObject? = FillableObject()
-    @SerializationData val nullableNull: FillableObject? = null
-    @SerializationData val listData = mutableListOf<FillableObject>()
-    @SerializationData val setData = mutableSetOf<FillableObject>()
-    @SerializationData val mapData = mutableMapOf<FillableObject, FillableObject>()
+class ReferencingObject: AReferencing() {
+    @SerializationData
+    override val data = FillableObject()
+    @SerializationData
+    override val nullableNotNull: FillableObject? = FillableObject()
+    @SerializationData
+    override val nullableNull: FillableObject? = null
+    @SerializationData
+    override val listData = mutableListOf<FillableObject>()
+    @SerializationData
+    override val setData = mutableSetOf<FillableObject>()
+    @SerializationData
+    override val mapData = mutableMapOf<FillableObject, FillableObject>()
 }
