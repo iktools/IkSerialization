@@ -75,16 +75,6 @@ class StandardBuilder(
             funBuilder.addCode(code.build())
         }
 
-        classInfo.producedData.forEach { property ->
-            if (property.type.isNullable)
-                funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
-
-            funBuilder.addStatement("session.rememberProduced(obj.${property.name}!!, name, \"${property.name}\")")
-
-            if (property.type.isNullable)
-                funBuilder.endControlFlow()
-        }
-
         funBuilder.addStatement("this.remember(obj, packedData, session)")
         funBuilder.addStatement("return obj")
     }
@@ -105,6 +95,16 @@ class StandardBuilder(
                 funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
 
             property.type.remember(funBuilder, "obj.${property.name}!!", "objData[\"${property.name}\"]!!, session")
+
+            if (property.type.isNullable)
+                funBuilder.endControlFlow()
+        }
+
+        classInfo.producedData.forEach { property ->
+            if (property.type.isNullable)
+                funBuilder.beginControlFlow("if (objData.containsKey(\"${property.name}\")) ")
+
+            funBuilder.addStatement("session.rememberProduced(obj.${property.name}!!, name, \"${property.name}\")")
 
             if (property.type.isNullable)
                 funBuilder.endControlFlow()
@@ -212,7 +212,6 @@ class StandardBuilder(
             if (field.type.isNullable)
                 packOwnFunc.beginControlFlow("if (obj.${field.name} != null)")
 
-            //TODO
             packOwnFunc.addStatement("session.register(obj.${field.name}, \"${field.type.name}\", session.referenceFor(obj).name, \"${field.name}\")")
 
             if (field.type.isNullable)

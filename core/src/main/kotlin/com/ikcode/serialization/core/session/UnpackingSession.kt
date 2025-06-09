@@ -31,7 +31,8 @@ class UnpackingSession(dataAnchors: Iterable<ReferenceAnchor>) {
 
     fun rememberProduced(obj: Any, factory: String, property: String) {
         val reference = this.references.entries.first {
-            it.value.factory?.reference == factory && it.value.factory?.property == property
+            val factoryData = (it.value.dataMap as? MutableMap<Any, Any>)?.get("@factory") as? List<Any>
+            factoryData?.size == 2 && factoryData[0] == factory && factoryData[1] == property
         }.value.pointer
 
         instantiatedObjects[reference.name] = obj

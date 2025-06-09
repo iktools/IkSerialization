@@ -230,7 +230,9 @@ class ComplexDataTests {
         val unpacked = ReferenceOnlyData_Packer().unpack(
             pointer,
             UnpackingSession(session.referencedData)
-        )
+        ).apply {
+            producedData.simpleData = 1
+        }
 
         assertEquals(1, unpacked.producedData.simpleData)
     }

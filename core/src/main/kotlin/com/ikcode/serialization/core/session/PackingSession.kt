@@ -1,6 +1,5 @@
 package com.ikcode.serialization.core.session
 
-import com.ikcode.serialization.core.references.FactoryPointer
 import com.ikcode.serialization.core.references.ReferenceAnchor
 import com.ikcode.serialization.core.references.ReferencePointer
 
@@ -17,11 +16,16 @@ class PackingSession {
     fun referenceFor(obj: Any) = this.references[obj]!!.pointer
 
     fun register(obj: Any, key: String, factory: String, property: String) {
-        this.references[obj] = ReferenceAnchor(
-            mapOf<Any, Any>(),
-            makePointer(key),
-            FactoryPointer(factory, property)
-        )
+        val anchor = this.references[obj]
+        val factoryData = listOf(factory, property)
+        if (anchor != null)
+            (anchor.dataMap as MutableMap<Any, Any>)["@factory"] = factoryData
+        else
+            this.references[obj] = ReferenceAnchor(
+                mutableMapOf<Any, Any>("@factory" to factoryData),
+                makePointer(key),
+            )
+
     }
 
     private fun makeReference(obj: Any, key: String, packer: (HashMap<String, Any>) -> Unit) =
