@@ -1,6 +1,6 @@
 pluginManagement {
     plugins {
-        kotlin("jvm") version "1.9.0"
+        kotlin("jvm") version "1.9.20"
     }
 }
 // The settings file is the entry point of every Gradle build.

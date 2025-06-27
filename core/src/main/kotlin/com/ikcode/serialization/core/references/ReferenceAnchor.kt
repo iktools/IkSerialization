@@ -1,6 +1,21 @@
 package com.ikcode.serialization.core.references
 
-class ReferenceAnchor(val value: Any, val pointer: ReferencePointer) {
+/**
+ * Anchor of a named object that pointers can point to.
+ */
+class ReferenceAnchor(
+    /**
+     * Serialization data for the object.
+     */
+    val value: Any,
+    /**
+     * Name of the object.
+     */
+    val pointer: ReferencePointer
+) {
+    /**
+     * Serialization data as a map.
+     */
     val dataMap get() = this.value as HashMap<*, *>
 
     override fun equals(other: Any?): Boolean {

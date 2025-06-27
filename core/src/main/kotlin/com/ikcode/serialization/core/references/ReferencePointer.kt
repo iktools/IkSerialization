@@ -1,6 +1,17 @@
 package com.ikcode.serialization.core.references
 
-class ReferencePointer(val name: String) {
+/**
+ * Pointer to a named object.
+ */
+class ReferencePointer(
+    /**
+     * Name of the object's anchor.
+     */
+    val name: String
+) {
+    /**
+     * Constructs a pointer out of class name and instance number
+     */
     constructor(type: String, index: Int): this(type + index.toString())
 
     override fun equals(other: Any?): Boolean {
@@ -15,5 +26,4 @@ class ReferencePointer(val name: String) {
     override fun hashCode(): Int {
         return name.hashCode()
     }
-
 }

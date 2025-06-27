@@ -3,6 +3,6 @@ plugins {
 }
 
 allprojects {
-    group = "com.ikcode.serialization"
+    group = "io.github.iktools"
     version = "0.1"
 }
