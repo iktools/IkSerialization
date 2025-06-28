@@ -1,9 +1,6 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
     kotlin("jvm")
-    `maven-publish`
-    id("com.vanniktech.maven.publish") version "0.30.0"
+    alias(libs.plugins.vanniktech)
 }
 
 kotlin {
@@ -11,8 +8,7 @@ kotlin {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
+    publishToMavenCentral()
     signAllPublications()
 
     coordinates(group.toString(), "serialization-core", version.toString())

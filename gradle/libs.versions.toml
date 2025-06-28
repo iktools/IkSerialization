@@ -16,3 +16,4 @@ kotlinpoet = ["kotlinpoetCore", "kotlinpoetKsp"]
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
+vanniktech = { id = "com.vanniktech.maven.publish", version = "0.33.0"}
