@@ -4,5 +4,5 @@ plugins {
 
 allprojects {
     group = "io.github.iktools"
-    version = "0.1"
+    version = "0.2"
 }

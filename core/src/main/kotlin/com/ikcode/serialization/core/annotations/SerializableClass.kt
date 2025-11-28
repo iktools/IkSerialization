@@ -9,6 +9,6 @@ annotation class SerializableClass(
     /**
      * Indicates whether a type can be extended in other modules.
      */
-    val isOpen: Boolean = false,
+    val crossModuleOpen: Boolean = false,
     val prefix: String = "_Packer"
 )

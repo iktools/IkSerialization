@@ -14,6 +14,7 @@ import kotlin.test.assertEquals
 
 class CrossModuleTests {
     //TODO test unpacking from base type
+    //TODO test derivation of abstract class that implements open interface
 
     @Test
     fun crossModuleImplementationTests() {

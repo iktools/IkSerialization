@@ -15,7 +15,7 @@ import com.ikcode.serialization.processor.types.TypeUtil
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ksp.toClassName
 
-class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: Set<KSClassDeclaration>) {
+class PackerInfo(val declaration: KSClassDeclaration, types: TypeUtil, allClasses: Set<KSClassDeclaration>) {
     val namespace = declaration.packageName.asString()
     val name = declaration.simpleName.asString()
     val kpType = declaration.toClassName()
@@ -26,7 +26,7 @@ class PackerInfo(declaration: KSClassDeclaration, types: TypeUtil, allClasses: S
     val isAbstract = Modifier.ABSTRACT in declaration.modifiers || declaration.classKind == ClassKind.INTERFACE
 
     @OptIn(KspExperimental::class)
-    val isOpen = declaration.getAnnotationsByType(SerializableClass::class).first().isOpen
+    val isOpen = declaration.getAnnotationsByType(SerializableClass::class).first().crossModuleOpen
     val outFileName = this.name + "_Packer" //TODO read from annotation
 
     val constructorParams = declaration.primaryConstructor?.parameters ?: listOf()

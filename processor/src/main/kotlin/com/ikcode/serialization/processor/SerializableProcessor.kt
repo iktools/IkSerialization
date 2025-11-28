@@ -32,11 +32,13 @@ class SerializableProcessor(private val environment: SymbolProcessorEnvironment)
 
         logger = environment.logger
         val packers = symbols.associate {
+            environment.logger.info("Making packer", it)
             val info = PackerInfo(it, types, symbols)
             info.justType to info
         }
 
         packers.values.forEach { packer ->
+            environment.logger.info("Making builder", packer.declaration)
             val fileText = when {
                 packer.isEnum -> EnumBuilder(packer)
                 packer.proxy != null -> ProxyBuilder(packer, types)

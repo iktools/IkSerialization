@@ -19,7 +19,7 @@ class SuperclassInfo(val type: KSType) {
 
     @OptIn(KspExperimental::class)
     val annotation = this.declaration.getAnnotationsByType(SerializableClass::class).firstOrNull()
-    val isOpen = annotation != null && annotation.isOpen
+    val isOpen = annotation != null && annotation.crossModuleOpen
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
